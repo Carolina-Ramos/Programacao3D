@@ -122,8 +122,8 @@ Vector Plane::getNormal(Vector point)
 bool Sphere::intercepts(Ray& r, float& t )
 {
 	//PUT HERE YOUR CODE
-	pow(radius, 2) = pow((x - center.x), 2) + pow((y - center.y, 2) + pow((z - center.z), 2);
-	ray = r.origin + t * r.direction;
+	/*pow(radius, 2) = pow((x - center.x), 2) + pow((y - center.y, 2) + pow((z - center.z), 2);
+	ray = r.origin + t * r.direction;*/
 	
   return (false);
 }
