@@ -1,5 +1,58 @@
-﻿  scene.cpp
+﻿  bvh.cpp
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(25,49): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(45,43): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(60,10): warning C4101: 'tmp': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(72,10): warning C4101: 'tmp': unreferenced local variable
+  grid.cpp
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(9,23): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(63,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(64,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(65,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(80,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(81,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(82,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(83,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(84,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(85,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(32,6): warning C4101: 'xmin': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(33,12): warning C4101: 'ymax': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(34,12): warning C4101: 'zmax': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(35,6): warning C4101: 'index': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(33,6): warning C4101: 'ymin': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(32,12): warning C4101: 'xmax': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(34,6): warning C4101: 'zmin': unreferenced local variable
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(124,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(134,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(144,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(177,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(178,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(179,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(183,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(184,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(185,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  main.cpp
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  scene.cpp
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
@@ -39,13 +92,7 @@ C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(628
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(628,91): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(633,45): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(633,72): warning C4305: 'argument': truncation from 'double' to 'float'
-  vector.cpp
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\vector.cpp(64,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Generating Code...
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\main.cpp(498): warning C4715: 'rayTracing': not all control paths return a value
   MyRayTracer.vcxproj -> C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\x64\Debug\MyRayTracer.exe
-  C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\Dependencies\lib\x64\DevIL.dll
-  C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\Dependencies\lib\x64\freeglut.dll
-  C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\Dependencies\lib\x64\glew32.dll
-  C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\Dependencies\lib\x64\ILU.dll
-  C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\Dependencies\lib\x64\ILUT.dll
-  5 File(s) copied
+  0 File(s) copied
