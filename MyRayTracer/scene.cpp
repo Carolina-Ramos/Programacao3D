@@ -39,7 +39,6 @@ Vector Triangle::getNormal(Vector point)
 //
 
 bool Triangle::intercepts(Ray& r, float& t ) {
-
 	//PUT HERE YOUR CODE
 	/*Vector normal = this->getNormal(normal);
 
@@ -94,6 +93,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
+
 	//PUT HERE YOUR CODE
 	/*Vector normal = this->getNormal(normal);
 	
@@ -122,8 +122,24 @@ Vector Plane::getNormal(Vector point)
 bool Sphere::intercepts(Ray& r, float& t )
 {
 	//PUT HERE YOUR CODE
-	/*pow(radius, 2) = pow((x - center.x), 2) + pow((y - center.y, 2) + pow((z - center.z), 2);
-	ray = r.origin + t * r.direction;*/
+
+	float a = r.direction.operator*(r.direction);
+	float b = 2 * r.origin.operator*(r.direction);
+	float c = r.origin.operator*(r.origin) - pow(radius, 2);
+	float det = pow(b, 2) - 4 * a * c;
+
+	if (det > 0) { //two solutions
+		float t0 = (-b + sqrt(det)) / 2*a;
+		float t1 = (-b - sqrt(det)) / 2*a;
+		return true;
+	}
+	else if (det == 0) { //one solution
+		t = -b / 2 * a;
+		return true;
+	}
+	else if (det < 0) {
+		return false;
+	}
 	
   return (false);
 }

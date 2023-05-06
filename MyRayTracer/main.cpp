@@ -478,9 +478,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	for (int i = 0; i < numObjs; i++) {
 		float result;
-		Object *obj = scene->getObject(i);
-		AABB box = obj->GetBoundingBox();
-		bool interception = box.intercepts(ray, result);
+		Object* obj = scene->getObject(i);
+		bool interception = obj->intercepts(ray, result);
 		if (!interception) {
 			return scene->GetBackgroundColor();
 		}
