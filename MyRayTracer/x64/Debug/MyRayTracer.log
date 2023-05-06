@@ -1,7 +1,12 @@
-﻿  bvh.cpp
+﻿  boundingBox.cpp
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\boundingBox.cpp(85,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\boundingBox.cpp(95,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\boundingBox.cpp(105,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\boundingBox.cpp(121,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  bvh.cpp
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(77,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,49): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
@@ -11,8 +16,8 @@ C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(60,10
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\bvh.cpp(72,10): warning C4101: 'tmp': unreferenced local variable
   grid.cpp
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(77,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,49): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
@@ -44,15 +49,15 @@ C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(184,
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\grid.cpp(185,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
   main.cpp
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(77,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,49): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   scene.cpp
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,119): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(77,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\camera.h(78,49): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
@@ -92,7 +97,10 @@ C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(628
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(628,91): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(633,45): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\scene.cpp(633,72): warning C4305: 'argument': truncation from 'double' to 'float'
+  vector.cpp
+C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\vector.cpp(64,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Generating Code...
 C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\MyRayTracer\main.cpp(498): warning C4715: 'rayTracing': not all control paths return a value
+  LINK : C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\x64\Debug\MyRayTracer.exe not found or not built by the last incremental link; performing full link
   MyRayTracer.vcxproj -> C:\Users\marta\Downloads\1.Universidade\PSJ\Labs\1\Try\x64\Debug\MyRayTracer.exe
   0 File(s) copied

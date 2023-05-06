@@ -5,3 +5,12 @@
 /.vs
 /x64/Debug
 /MyRayTracer/x64/Debug/MyRayTracer.tlog
+/MyRayTracer/x64/Debug
+MyRayTracer/x64/Debug/bvh.obj
+MyRayTracer/x64/Debug/grid.obj
+MyRayTracer/x64/Debug/main.obj
+MyRayTracer/x64/Debug/MyRayTracer.ilk
+MyRayTracer/x64/Debug/MyRayTracer.log
+MyRayTracer/x64/Debug/scene.obj
+MyRayTracer/x64/Debug/vc142.idb
+MyRayTracer/x64/Debug/vc142.pdb
