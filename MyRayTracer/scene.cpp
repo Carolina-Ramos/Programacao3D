@@ -110,6 +110,8 @@ bool Plane::intercepts( Ray& r, float& t )
 	t = (r.origin - contact).length();
 	return true;*/
 
+	float denom = this->getNormal().operator*(r.direction);
+
    return (false);
 }
 
