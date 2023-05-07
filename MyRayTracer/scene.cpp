@@ -73,7 +73,8 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    float l;
 
    //Calculate the normal plane: counter-clockwise vectorial product.
-   PN = Vector(0, 0, 0);		
+   PN = (P1 - P0).operator%(P2 - P0);
+   //PN = Vector(0, 0, 0);		
 
    if ((l=PN.length()) == 0.0)
    {
@@ -110,9 +111,15 @@ bool Plane::intercepts( Ray& r, float& t )
 	t = (r.origin - contact).length();
 	return true;*/
 
-	float denom = this->getNormal().operator*(r.direction);
-
-   return (false);
+	Vector n = this->getNormal({ 0,0,0 });
+	float denom = n.operator*(r.direction); //dot(n, d)
+	if (denom > 0) { //ray points at the planes direction
+		Vector dist = this->getCentroid() - r.origin; //centroid is not defined properly
+		t = dist.operator*(n) / denom;
+		return (t >= 0);
+	} 
+	//printf("NOPE\n");
+	return false; //ray points the opposite direction of the plane
 }
 
 Vector Plane::getNormal(Vector point) 
