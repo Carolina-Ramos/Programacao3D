@@ -479,14 +479,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	float dist, minDist = 100000000;
 	int minIndex = -1;
 
-	Object* obj = scene->getObject(0);
-	bool interception = obj->intercepts(ray, dist);
-	if (interception) {
-		minDist = dist;
-		minIndex = 0;
-	}
-
-	for (int i = 1; i < numObjs; i++) {
+	for (int i = 0; i < numObjs; i++) {
 		float dist;
 		Object* obj = scene->getObject(i);
 		bool interception = obj->intercepts(ray, dist);
