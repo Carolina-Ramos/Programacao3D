@@ -84,7 +84,8 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    {
      PN.normalize();
 	 //Calculate D
-     D  = 0.0f;
+     //D  = 0.0f;
+	 D = P0.length();
    }
 }
 
@@ -114,11 +115,11 @@ bool Plane::intercepts( Ray& r, float& t )
 	Vector n = this->getNormal({ 0,0,0 });
 	float denom = n.operator*(r.direction); //dot(n, d)
 	if (denom > 0) { //ray points at the planes direction
-		Vector dist = this->getCentroid() - r.origin; //centroid is not defined properly
+		Vector p0 = r.origin + r.direction * this->D - r.direction;
+		Vector dist = p0 - r.origin; //centroid is not defined properly
 		t = dist.operator*(n) / denom;
 		return (t >= 0);
 	} 
-	//printf("NOPE\n");
 	return false; //ray points the opposite direction of the plane
 }
 
