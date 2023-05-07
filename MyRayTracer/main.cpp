@@ -474,13 +474,15 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
+	Object* obj;
+	Light* light;
 
 	float dist, minDist = 100000000;
 	int minIndex = -1;
 
 	for (int i = 0; i < numObjs; i++) {
 		float dist;
-		Object* obj = scene->getObject(i);
+		obj = scene->getObject(i);
 		bool interception = obj->intercepts(ray, dist);
 		if (interception) {
 			if (dist < minDist) {
@@ -489,14 +491,27 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 		}
 	}
-
-	Vector p = ray.origin + ray.direction.operator*(minDist); //point to shoot the shadow ray from
 	
 	if (minIndex == -1) {
 		return scene->GetBackgroundColor();
 	}
 	else{
-		return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
+		Vector hitPoint = ray.origin + ray.direction.operator*(minDist); //point to shoot the shadow ray from
+		Vector shadowDir;
+		Vector n = scene->getObject(minIndex)->getNormal(hitPoint);
+
+		for (int l = 0; l < numLights; l++) {
+			light = scene->getLight(l);
+			shadowDir = light->position.operator-(hitPoint).normalize();
+			if (shadowDir.operator*(n) > 0) {
+				//chamar raytracing outra vez
+				return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
+			}
+			//Ray shadowRay = Ray(hitPoint, shadowDir);
+		}
+		//in shadow
+		return Color(0.0f, 0.0f, 0.0f);
+		//return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
 	}
 
 	//INSERT HERE YOUR CODE
