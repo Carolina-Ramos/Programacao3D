@@ -455,23 +455,22 @@ void setupGLUT(int argc, char* argv[])
 
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
-	//AABB::intercepts(ray, result);
 	
 	/*for (obj in scene) {
 		intersection(ray, obj);
 		store(closestIntersection);
-		if (!intersection) {
-			color = backgroundColor;
+	}
+	if (!intersection) {
+		color = backgroundColor;
+	}
+	else {
+		foreach(light in lights) {
+			shadowRay(origin, light);
 		}
-		else {
-			foreach(light in lights) {
-				shadowRay(origin, light);
-			}
-			if (!hit)
-				color = color + lights + materials;
-		}
-		
+		if (!hit)
+			color = color + lights + materials;
 	}*/
+		
 
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
@@ -493,12 +492,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	Vector p = ray.origin + ray.direction.operator*(minDist); //point to shoot the shadow ray from
 	
-	if (minIndex != -1) {
-		return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
-	}
-	else
-	{
+	if (minIndex == -1) {
 		return scene->GetBackgroundColor();
+	}
+	else{
+		return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
 	}
 
 	//INSERT HERE YOUR CODE
