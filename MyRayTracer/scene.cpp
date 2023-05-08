@@ -90,26 +90,23 @@ Vector Plane::getNormal(Vector point)
 bool Sphere::intercepts(Ray& r, float& t )
 {
 	//PUT HERE YOUR CODE
+	Vector oc = this->center - r.origin;
+	float b = r.direction * oc;
+	float c = (oc * oc) - pow(this->radius, 2);
 
-	float a = r.direction.operator*(r.direction);
-	float b = ((r.origin.operator-(center))).operator*(2) * r.direction;
-	float c = (r.origin.operator-(center) * r.origin.operator-(center)) - pow(radius, 2);
-	float det = pow(b, 2) - 4 * a * c;
+	if (c < 0) {
+		t = b + sqrt(pow(b, 2) - c);
+	}
+	else {
+		if (b <= 0) return false;
+		else {
+			if ((pow(b, 2) - c) <= 0) return false;
+			else {
+				t = b - sqrt(pow(b, 2) - c);
+			}
+		}
+	}
 
-	if (det > 0) { //two solutions
-		float t0 = (-b + sqrt(det)) / 2*a;
-		float t1 = (-b - sqrt(det)) / 2*a;
-		return true;
-	}
-	else if (det == 0) { //one solution
-		t = -b / 2 * a;
-		return true;
-	}
-	else if (det < 0) {
-		return false;
-	}
-	
-  return (false);
 }
 
 
