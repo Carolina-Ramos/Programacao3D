@@ -477,11 +477,10 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	Object* obj;
 	Light* light;
-	float minDist = FLT_MAX;
+	float dist, minDist = FLT_MAX;
 	int minIndex = -1;
 
 	for (int i = 0; i < numObjs; i++) {
-		float dist;
 		obj = scene->getObject(i);
 		bool interception = obj->intercepts(ray, dist);
 		if (interception) {
@@ -504,9 +503,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		for (int l = 0; l < numLights; l++) {
 			light = scene->getLight(l);
 			shadowDir = (light->position - hitPoint).normalize();
-			if (true) {
+			if (shadowDir.operator*(n) > 0) {
 				//chamar raytracing outra vez
-				return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
+				Material* m = scene->getObject(minIndex)->GetMaterial();
+				Vector h = (shadowDir - ray.direction).normalize();
+				return
+					m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir) +
+					m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
 			}
 			//Ray shadowRay = Ray(hitPoint, shadowDir);
 		}
