@@ -477,7 +477,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Object* obj;
 	Light* light;
 
-	float dist, minDist = 100000000;
+	float minDist = FLT_MAX;
 	int minIndex = -1;
 
 	for (int i = 0; i < numObjs; i++) {
@@ -492,18 +492,19 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		}
 	}
 	
+
 	if (minIndex == -1) {
 		return scene->GetBackgroundColor();
 	}
 	else{
 		Vector hitPoint = ray.origin + ray.direction.operator*(minDist); //point to shoot the shadow ray from
 		Vector shadowDir;
-		Vector n = scene->getObject(minIndex)->getNormal(hitPoint);
+		Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
 
 		for (int l = 0; l < numLights; l++) {
 			light = scene->getLight(l);
 			shadowDir = light->position.operator-(hitPoint).normalize();
-			if (shadowDir.operator*(n) > 0) {
+			if (true) {
 				//chamar raytracing outra vez
 				return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
 			}

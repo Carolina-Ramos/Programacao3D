@@ -71,11 +71,9 @@ Plane::Plane(Vector& a_PN, float a_D)
 Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 {
    float l;
-
+   this->P0 = P0;
    //Calculate the normal plane: counter-clockwise vectorial product.
-   PN = (P1 - P0).operator%(P2 - P0);
-   //PN = Vector(0, 0, 0);		
-
+   PN = (P1 - P0) % (P2 - P0);	
    if ((l=PN.length()) == 0.0)
    {
      cerr << "DEGENERATED PLANE!\n";
@@ -85,7 +83,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
      PN.normalize();
 	 //Calculate D
      //D  = 0.0f;
-	 D = P0.length();
+	 D = PN * P0;
    }
 }
 
@@ -111,7 +109,7 @@ bool Plane::intercepts( Ray& r, float& t )
 	Vector contact = r.origin + r.direction.normalize() * x; //Make sure your ray vector is normalized
 	t = (r.origin - contact).length();
 	return true;*/
-
+	/*
 	Vector n = this->getNormal({ 0,0,0 });
 	float denom = n.operator*(r.direction); //dot(n, d)
 	if (denom > 0) { //ray points at the planes direction
@@ -119,8 +117,17 @@ bool Plane::intercepts( Ray& r, float& t )
 		Vector dist = p0 - r.origin; //centroid is not defined properly
 		t = dist.operator*(n) / denom;
 		return (t >= 0);
-	} 
-	return false; //ray points the opposite direction of the plane
+	}
+	*/
+
+	// considering vectors are normalized
+
+	float denom = PN  * r.direction;
+	if (denom < EPSILON) {
+		return false;
+	}
+	t = ((r.origin - P0) * PN) / (denom);
+	return (t > 0);
 }
 
 Vector Plane::getNormal(Vector point) 
@@ -134,8 +141,8 @@ bool Sphere::intercepts(Ray& r, float& t )
 	//PUT HERE YOUR CODE
 
 	float a = r.direction.operator*(r.direction);
-	float b = 2 * r.origin.operator*(r.direction);
-	float c = r.origin.operator*(r.origin) - pow(radius, 2);
+	float b = ((r.origin.operator-(center))).operator*(2) * r.direction;
+	float c = (r.origin.operator-(center) * r.origin.operator-(center)) - pow(radius, 2);
 	float det = pow(b, 2) - 4 * a * c;
 
 	if (det > 0) { //two solutions

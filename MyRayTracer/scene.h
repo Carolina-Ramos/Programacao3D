@@ -81,6 +81,7 @@ protected:
 class Plane : public Object
 {
 protected:
+  Vector     P0;
   Vector	 PN;
   float 	 D;
 
