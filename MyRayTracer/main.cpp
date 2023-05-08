@@ -474,15 +474,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
-	Object* obj;
-	Light* light;
 
 	float minDist = FLT_MAX;
 	int minIndex = -1;
 
 	for (int i = 0; i < numObjs; i++) {
 		float dist;
-		obj = scene->getObject(i);
+		Object* obj = scene->getObject(i);
 		bool interception = obj->intercepts(ray, dist);
 		if (interception) {
 			if (dist < minDist) {
