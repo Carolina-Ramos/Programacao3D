@@ -40,27 +40,6 @@ Vector Triangle::getNormal(Vector point)
 
 bool Triangle::intercepts(Ray& r, float& t ) {
 	//PUT HERE YOUR CODE
-	/*Vector normal = this->getNormal(normal);
-
-	// get d value
-	float d = normal.operator*(this->getCentroid());
-	if (normal.operator*(r.direction) == 0) {
-		return false; // No intersection, the line is parallel to the plane
-	}
-	// Compute the X value for the directed line ray intersecting the plane
-	float x = (d - normal.operator*(r.origin)) / normal.operator*(r.direction);
-
-	// output contact point
-	Vector contact = r.origin + r.direction.normalize() * x; //Make sure your ray vector is normalized
-	t = (r.origin - contact).length();
-
-	float c1 = ((this->points[1] - this->points[0]).operator%(contact - this->points[0])).operator*(normal);
-	float c2 = ((this->points[2] - this->points[1]).operator%(contact - this->points[1])).operator*(normal);
-	float c3 = ((this->points[0] - this->points[2]).operator%(contact - this->points[2])).operator*(normal);
-	
-	return c1 >= 0 && c2 >= 0 && c3 >= 0;*/
-
-
 	return (false);
 }
 
@@ -82,7 +61,6 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    {
      PN.normalize();
 	 //Calculate D
-     //D  = 0.0f;
 	 D = - (PN * P0);
    }
 }
@@ -93,34 +71,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
-
 	//PUT HERE YOUR CODE
-	/*Vector normal = this->getNormal(normal);
-	
-	// get d value
-	float d = normal.operator*(this->getCentroid());
-	if (normal.operator*(r.direction) == 0) {
-		return false; // No intersection, the line is parallel to the plane
-	}
-	// Compute the X value for the directed line ray intersecting the plane
-	float x = (d - normal.operator*(r.origin)) / normal.operator*(r.direction);
-
-	// output contact point
-	Vector contact = r.origin + r.direction.normalize() * x; //Make sure your ray vector is normalized
-	t = (r.origin - contact).length();
-	return true;*/
-	/*
-	Vector n = this->getNormal({ 0,0,0 });
-	float denom = n.operator*(r.direction); //dot(n, d)
-	if (denom > 0) { //ray points at the planes direction
-		Vector p0 = r.origin + r.direction * this->D - r.direction;
-		Vector dist = p0 - r.origin; //centroid is not defined properly
-		t = dist.operator*(n) / denom;
-		return (t >= 0);
-	}
-	*/
-
-	// considering vectors are normalized
 
 	float denom = PN  * r.direction;
 	if (fabs  (denom) < EPSILON) {
