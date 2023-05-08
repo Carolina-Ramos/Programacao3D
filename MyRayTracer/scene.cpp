@@ -83,7 +83,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
      PN.normalize();
 	 //Calculate D
      //D  = 0.0f;
-	 D = PN * P0;
+	 D = - (PN * P0);
    }
 }
 
@@ -123,10 +123,10 @@ bool Plane::intercepts( Ray& r, float& t )
 	// considering vectors are normalized
 
 	float denom = PN  * r.direction;
-	if (denom < EPSILON) {
+	if (fabs  (denom) < EPSILON) {
 		return false;
 	}
-	t = ((r.origin - P0) * PN) / (denom);
+	t = - ((r.origin - P0) * PN) / (denom);
 	return (t > 0);
 }
 
