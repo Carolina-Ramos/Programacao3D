@@ -82,7 +82,7 @@ int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
-
+int bounces = 2;
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -453,6 +453,13 @@ void setupGLUT(int argc, char* argv[])
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
+Vector reflect(Vector& I, Vector& N) {
+	Vector a = Vector(I.x - 2.0f, I.y - 2.0f, I.z - 2.0f);
+	float dot = I * N;
+	Vector b = Vector(a.x * dot, a.y * dot, a.z * dot);
+	return  Vector(b.x * N.x, b.y * N.y, b.z * N.z);
+}
+
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
 	
@@ -474,71 +481,72 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
+	Color finalColor(0.0f, 0.0f, 0.0f);
 
-	Object* obj;
-	Light* light;
-	float dist, minDist = FLT_MAX;
-	int minIndex = -1;
+	float multiplier = 1.0f;
 
-	for (int i = 0; i < numObjs; i++) {
-		obj = scene->getObject(i);
-		bool interception = obj->intercepts(ray, dist);
-		if (interception) {
-			if (dist < minDist) {
-				minDist = dist;
-				minIndex = i;
-			}
-		}
-	}
+	for (int i = 0; i < bounces; i++) {
 	
+		Object* obj;
+		Light* light;
+		float dist, minDist = FLT_MAX;
+		int minIndex = -1;
 
-	if (minIndex == -1) {
-		return scene->GetBackgroundColor();
-	}
-	else{
-		Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
-		Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
-		Material* m = scene->getObject(minIndex)->GetMaterial();
-		//Color color = m->GetAmbientColor() * scene->GetAmbientLight();
-		Vector shadowDir;
-		Color finalColor(0.0f, 0.0f, 0.0f); // Initialize final color to black
-
-
-		for (int l = 0; l < numLights; l++) {
-			light = scene->getLight(l);
-			shadowDir = (light->position - hitPoint).normalize();
-			float shadowDist = (light->position - hitPoint).length();
-
-			bool inShadow = false;
-			for (int i = 0; i < numObjs; i++) {
-				if (i == minIndex) {
-					continue; // Skip object we are checking intersection against
-				}
-
-				obj = scene->getObject(i);
-				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
-					inShadow = true;
-					break;
+		for (int i = 0; i < numObjs; i++) {
+			obj = scene->getObject(i);
+			bool interception = obj->intercepts(ray, dist);
+			if (interception) {
+				if (dist < minDist) {
+					minDist = dist;
+					minIndex = i;
 				}
 			}
-
-			if (!inShadow) {
-				//chamar raytracing outra vez
-				Material* m = scene->getObject(minIndex)->GetMaterial();
-				Vector h = (shadowDir - ray.direction).normalize();
-				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir);
-				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
-				finalColor += light->color * (diffuse + specular);
-			}
-			//Ray shadowRay = Ray(hitPoint, shadowDir);
 		}
-		//in shadow
-		return finalColor;
-		//return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
-	}
 
-	//INSERT HERE YOUR CODE
-	//return Color(0.0f, 0.0f, 0.0f);
+		if (minIndex == -1) {
+			finalColor += scene->GetBackgroundColor() * multiplier;
+			break;
+		} else {
+			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
+			Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
+			Material* m = scene->getObject(minIndex)->GetMaterial();
+			
+			Color color(0.0f, 0.0f, 0.0f);
+			Vector shadowDir;
+			bool inShadow = false;
+			for (int l = 0; l < numLights; l++) {
+				light = scene->getLight(l);
+				shadowDir = (light->position - hitPoint).normalize();
+				float shadowDist = (light->position - hitPoint).length();
+
+			
+				for (int i = 0; i < numObjs; i++) {
+					if (i == minIndex) {
+						continue; // Skip object we are checking intersection against
+					}
+
+					obj = scene->getObject(i);
+					if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+						inShadow = true;
+						break;
+					}
+				}
+				if (!inShadow) {
+					Vector h = (shadowDir - ray.direction).normalize();
+					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir);
+					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
+					color += light->color * (diffuse + specular);
+				}
+			}
+
+			
+			finalColor += color * multiplier;
+			multiplier *= 0.5f;
+			ray.origin = hitPoint + n * 0.0001f;
+			ray.direction = reflect(ray.direction, n);
+		}
+	}
+	return finalColor;
 }
 
 
