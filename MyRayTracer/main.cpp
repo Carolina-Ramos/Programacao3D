@@ -497,24 +497,43 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	}
 	else{
 		Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
-		Vector shadowDir;
 		Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
+		Material* m = scene->getObject(minIndex)->GetMaterial();
+		//Color color = m->GetAmbientColor() * scene->GetAmbientLight();
+		Vector shadowDir;
+		Color finalColor(0.0f, 0.0f, 0.0f); // Initialize final color to black
+
 
 		for (int l = 0; l < numLights; l++) {
 			light = scene->getLight(l);
 			shadowDir = (light->position - hitPoint).normalize();
-			if (shadowDir.operator*(n) > 0) {
+			float shadowDist = (light->position - hitPoint).length();
+
+			bool inShadow = false;
+			for (int i = 0; i < numObjs; i++) {
+				if (i == minIndex) {
+					continue; // Skip object we are checking intersection against
+				}
+
+				obj = scene->getObject(i);
+				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+					inShadow = true;
+					break;
+				}
+			}
+
+			if (!inShadow) {
 				//chamar raytracing outra vez
 				Material* m = scene->getObject(minIndex)->GetMaterial();
 				Vector h = (shadowDir - ray.direction).normalize();
-				return
-					m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir) +
-					m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
+				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir);
+				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
+				finalColor += light->color * (diffuse + specular);
 			}
 			//Ray shadowRay = Ray(hitPoint, shadowDir);
 		}
 		//in shadow
-		return Color(0.0f, 0.0f, 0.0f);
+		return finalColor;
 		//return scene->getObject(minIndex)->GetMaterial()->GetDiffColor();
 	}
 
