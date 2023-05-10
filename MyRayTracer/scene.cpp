@@ -40,7 +40,19 @@ Vector Triangle::getNormal(Vector point)
 
 bool Triangle::intercepts(Ray& r, float& t ) {
 	//PUT HERE YOUR CODE
-	return (false);
+	//return (false);
+
+	Vector ab = this->points[1] - this->points[0];
+	Vector ac = this->points[2] - this->points[0];
+	Vector ao = r.origin - this->points[0];
+	Vector d = (r.direction) * (-1);
+	float beta, gama;
+
+	beta = ao.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ao.z) - (ao.y * d.z)) + d.x * ((ao.y * ac.z) - (ac.y * ao.z)) /
+		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
+
+	if (0 <= beta <= 1 && 0 <= gama <= 1 && 0 <= beta + gama <= 1) return true;
+	else return false;
 }
 
 Plane::Plane(Vector& a_PN, float a_D)
