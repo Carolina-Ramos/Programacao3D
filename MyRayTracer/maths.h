@@ -98,7 +98,7 @@ inline Vector rnd_unit_disk(void) {
 inline Vector rnd_unit_sphere(void) {
 	Vector p;
 	do {
-		p = Vector(rand_float(), rand_float(), rand_float()) * 2 - Vector(1.0, 1.0, 0.0);
+		p = Vector(rand_float(), rand_float(), rand_float()) * 2 - Vector(1.0, 1.0, 1.0);
 	} while (p * p >= 1.0);
 	return p;
 }

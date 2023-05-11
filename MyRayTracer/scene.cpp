@@ -46,7 +46,7 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 	Vector ac = this->points[2] - this->points[0];
 	Vector ao = r.origin - this->points[0];
 	Vector d = (r.direction) * (-1);
-	float beta, gama;
+	float beta, gama = 0;
 
 	beta = ao.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ao.z) - (ao.y * d.z)) + d.x * ((ao.y * ac.z) - (ac.y * ao.z)) /
 		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
@@ -604,7 +604,7 @@ void Scene::create_random_scene() {
 	this->SetAccelStruct(BVH_ACC);
 	this->SetSamplesPerPixel(0);
 	
-	camera = new Camera(Vector(-5.312192, 4.456562, 11.963158), Vector(0.0, 0.0, 0), Vector(0.0, 1.0, 0.0), 45.0, 0.01, 10000.0, 800, 600, 0, 1.5f);
+	camera = new Camera(Vector(-5.312192, 4.456562, 11.963158), Vector(0.0, 0.0, 0), Vector(0.0, 1.0, 0.0), 45.0, 0.01, 10000.0, 512, 512, 0, 1.5f);
 	this->SetCamera(camera);
 
 	this->addLight(new Light(Vector(7, 10, -5), Color(1.0, 1.0, 1.0)));
