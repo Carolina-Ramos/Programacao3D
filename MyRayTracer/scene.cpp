@@ -663,7 +663,7 @@ void Scene::create_random_scene() {
 	this->SetAccelStruct(BVH_ACC);
 	this->SetSamplesPerPixel(0);
 	
-	camera = new Camera(Vector(-5.312192, 4.456562, 11.963158), Vector(0.0, 0.0, 0), Vector(0.0, 1.0, 0.0), 45.0, 0.01, 10000.0, 800, 600, 0, 1.5f);
+	camera = new Camera(Vector(-5.312192, 4.456562, 11.963158), Vector(0.0, 0.0, 0), Vector(0.0, 1.0, 0.0), 45.0, 0.01, 10000.0, 512, 512, 0, 1.5f);
 	this->SetCamera(camera);
 
 	this->addLight(new Light(Vector(7, 10, -5), Color(1.0, 1.0, 1.0)));

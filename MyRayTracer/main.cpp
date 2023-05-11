@@ -82,7 +82,6 @@ int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
-int bounces = 2;
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -462,22 +461,6 @@ Vector reflect(Vector& I, Vector& N) {
 
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
-	
-	/*for (obj in scene) {
-		intersection(ray, obj);
-		store(closestIntersection);
-	}
-	if (!intersection) {
-		color = backgroundColor;
-	}
-	else {
-		foreach(light in lights) {
-			shadowRay(origin, light);
-		}
-		if (!hit)
-			color = color + lights + materials;
-	}*/
-		
 
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
@@ -485,7 +468,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	float multiplier = 1.0f;
 
-	for (int i = 0; i < bounces; i++) {
+	for (int i = 0; i < MAX_DEPTH; i++) {
 	
 		Object* obj;
 		Light* light;
@@ -512,14 +495,16 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			Material* m = scene->getObject(minIndex)->GetMaterial();
 			
 			Color color(0.0f, 0.0f, 0.0f);
+			Color diffuse;
 			Vector shadowDir;
-			bool inShadow = false;
 			for (int l = 0; l < numLights; l++) {
+				bool inShadow = false;
 				light = scene->getLight(l);
 				shadowDir = (light->position - hitPoint).normalize();
 				float shadowDist = (light->position - hitPoint).length();
-
-			
+				if(shadowDir * n <= 0){
+					continue;
+				}
 				for (int i = 0; i < numObjs; i++) {
 					if (i == minIndex) {
 						continue; // Skip object we are checking intersection against
@@ -533,16 +518,14 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				}
 				if (!inShadow) {
 					Vector h = (shadowDir - ray.direction).normalize();
-					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * (n * shadowDir);
-					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(h * n, m->GetShine());
+					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
+					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
 					color += light->color * (diffuse + specular);
 				}
 			}
-
-			
 			finalColor += color * multiplier;
-			multiplier *= 0.5f;
-			ray.origin = hitPoint + n * 0.0001f;
+			multiplier *= m->GetReflection();
+			ray.origin = hitPoint + n * 0.001f;
 			ray.direction = reflect(ray.direction, n);
 		}
 	}
