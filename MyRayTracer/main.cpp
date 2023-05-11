@@ -541,29 +541,43 @@ void renderScene()
 	int index_pos = 0;
 	int index_col = 0;
 	unsigned int counter = 0;
+	int spp = scene->GetSamplesPerPixel();
+	int n = sqrt(spp);
 
 	if (drawModeEnabled) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		scene->GetCamera()->SetEye(Vector(camX, camY, camZ));  //Camera motion
 	}
 
-	for (int y = 0; y < RES_Y; y++)
-	{
-		for (int x = 0; x < RES_X; x++)
-		{
-			Color color;
+	for (int y = 0; y < RES_Y; y++){
+		for (int x = 0; x < RES_X; x++){
 
-			Vector pixel;  //viewport coordinates
-			pixel.x = x + 0.5f;
-			pixel.y = y + 0.5f;
+			Color color = { 0, 0, 0 };
 
-			//YOUR 2 FUNTIONS:
-			Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+			//distributed ray-tracing
+			if (spp != 0){ 
+				for (int p = 0; p < n; p++) {
+					for (int q = 0; q < n; q++) {
+						Vector pixel;  //viewport coordinates
+						pixel.x = x + (p + rand_float()) / n;
+						pixel.y = y + (q + rand_float()) / n;
 
-			color = rayTracing(ray, 1, 1.0).clamp();
-			
+						Ray ray = scene->GetCamera()->PrimaryRay(pixel);
 
-			//color = scene->GetBackgroundColor(); //TO CHANGE - just for the template
+						color += rayTracing(ray, 1, 1.0).clamp();
+					}
+				}
+				color = { color.r() / spp, color.g() / spp, color.b() / spp };
+			}
+			//Whitted Ray-Tracing
+			else { 
+				Vector pixel; 
+				pixel.x = x + 0.5f;
+				pixel.y = y + 0.5f;
+
+				Ray ray = scene->GetCamera()->PrimaryRay(pixel); 
+				color = rayTracing(ray, 1, 1.0).clamp();
+			}
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());
@@ -579,6 +593,8 @@ void renderScene()
 				colors[index_col++] = (float)color.b();
 			}
 		}
+
+			
 
 	}
 	if (drawModeEnabled) {
