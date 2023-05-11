@@ -42,7 +42,7 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 	//PUT HERE YOUR CODE
 	//return (false);
 
-	Vector ab = this->points[1] - this->points[0];
+	/*Vector ab = this->points[1] - this->points[0];
 	Vector ac = this->points[2] - this->points[0];
 	Vector ao = r.origin - this->points[0];
 	Vector d = (r.direction) * (-1);
@@ -51,8 +51,44 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 	beta = ao.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ao.z) - (ao.y * d.z)) + d.x * ((ao.y * ac.z) - (ac.y * ao.z)) /
 		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
 
+	gama = ab.x * ((ao.y * d.z) - (d.y * ao.z)) + ao.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ao.z) - (ao.y * ab.z)) /
+		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
+
+	t = ab.x * ((ac.y * ao.z) - (d.y * ac.z)) + ac.x * ((ao.y * ab.z) - (ab.y * ao.z)) + ao.x * ((ab.y * ac.z) - (ac.y * ab.z)) /
+		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
+
 	if (0 <= beta <= 1 && 0 <= gama <= 1 && 0 <= beta + gama <= 1) return true;
-	else return false;
+	else return false;*/
+
+	Vector edge1, edge2, edge3, tvec, pvec, qvec;
+	float det, inv_det;
+
+	edge1 = points[1] - points[0];
+	edge2 = points[2] - points[0];
+
+	pvec = r.direction % edge2;
+
+	det = edge1 * pvec;
+
+	if (det < EPSILON) return false;
+
+	tvec = r.origin - points[0];
+
+	float u = tvec * pvec;
+	if (u < 0 || u > det) return false;
+
+	qvec = tvec % edge1;
+
+	float v = r.direction * qvec;
+	if (v < 0 || u + v > det) return false;
+
+	t = edge2 * qvec;
+	inv_det = 1.f / det;
+	t *= inv_det;
+	u *= inv_det;
+	v *= inv_det;
+
+	return true;
 }
 
 Plane::Plane(Vector& a_PN, float a_D)
