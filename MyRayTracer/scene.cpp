@@ -39,26 +39,6 @@ Vector Triangle::getNormal(Vector point)
 //
 
 bool Triangle::intercepts(Ray& r, float& t ) {
-	//PUT HERE YOUR CODE
-	//return (false);
-
-	/*Vector ab = this->points[1] - this->points[0];
-	Vector ac = this->points[2] - this->points[0];
-	Vector ao = r.origin - this->points[0];
-	Vector d = (r.direction) * (-1);
-	float beta, gama;
-
-	beta = ao.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ao.z) - (ao.y * d.z)) + d.x * ((ao.y * ac.z) - (ac.y * ao.z)) /
-		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
-
-	gama = ab.x * ((ao.y * d.z) - (d.y * ao.z)) + ao.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ao.z) - (ao.y * ab.z)) /
-		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
-
-	t = ab.x * ((ac.y * ao.z) - (d.y * ac.z)) + ac.x * ((ao.y * ab.z) - (ab.y * ao.z)) + ao.x * ((ab.y * ac.z) - (ac.y * ab.z)) /
-		ab.x * ((ac.y * d.z) - (d.y * ac.z)) + ac.x * ((d.y * ab.z) - (ab.y * d.z)) + d.x * ((ab.y * ac.z) - (ac.y * ab.z));
-
-	if (0 <= beta <= 1 && 0 <= gama <= 1 && 0 <= beta + gama <= 1) return true;
-	else return false;*/
 
 	Vector edge1, edge2, edge3, tvec, pvec, qvec;
 	float det, inv_det;
@@ -119,8 +99,6 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
-
 	float denom = PN  * r.direction;
 	if (fabs  (denom) < EPSILON) {
 		return false;
@@ -137,7 +115,6 @@ Vector Plane::getNormal(Vector point)
 
 bool Sphere::intercepts(Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
 	Vector oc = this->center - r.origin;
 	float b = r.direction * oc;
 	float c = (oc * oc) - pow(this->radius, 2);
@@ -168,7 +145,12 @@ AABB Sphere::GetBoundingBox() {
 	Vector a_min;
 	Vector a_max ;
 
-	//PUT HERE YOUR CODE
+	Vector center = this->center;
+	float r = this->radius;
+
+	a_min = { center.x - r, center.y - r, center.z - r };
+	a_max = { center.x + r, center.y + r, center.z + r };
+
 	return(AABB(a_min, a_max));
 }
 
@@ -184,8 +166,85 @@ AABB aaBox::GetBoundingBox() {
 
 bool aaBox::intercepts(Ray& ray, float& t)
 {
-	//PUT HERE YOUR CODE
-		return (false);
+	double tx_min, ty_min, tz_min, tx_max, ty_max, tz_max;
+
+	double a = 1 / ray.direction.x;
+	double b = 1 / ray.direction.y;
+	double c = 1 / ray.direction.z;
+
+	float tE, tL;
+	Vector face_in, face_out;
+
+	if (a >= 0) {
+		tx_min = (min.x - ray.origin.x) * a;
+		tx_max = (max.x - ray.origin.x) * a;
+	}
+	else {
+		tx_min = (max.x - ray.origin.x) * a;
+		tx_max = (min.x - ray.origin.x) * a;
+	}
+
+	if (b >= 0) {
+		ty_min = (min.y - ray.origin.y) * b;
+		ty_max = (max.y - ray.origin.y) * b;
+	}
+	else {
+		ty_min = (max.y - ray.origin.y) * b;
+		ty_max = (min.y - ray.origin.y) * b;
+	}
+
+	if (c >= 0) {
+		tz_min = (min.z - ray.origin.z) * c;
+		tz_max = (max.z - ray.origin.z) * c;
+	}
+	else {
+		tz_min = (max.z - ray.origin.z) * c;
+		tz_max = (min.z - ray.origin.z) * c;
+	}
+
+	//find largest tE
+	if (tx_min > ty_min) {
+		tE = tx_min;
+		face_in = (a >= 0.f) ? Vector(-1, 0, 0) : Vector(1, 0, 0);
+	}
+	else {
+		tE = ty_min;
+		face_in = (b >= 0.f) ? Vector(0, -1, 0) : Vector(0, 1, 0);
+	}
+	if (tz_min > tE) {
+		tE = tz_min;
+		face_in = (c >= 0.f) ? Vector(0, 0, -1) : Vector(0, 0, 1);
+	}
+
+	//find smallest tL
+	if (tx_max < ty_max) {
+		tL = tx_max;
+		face_out = (a >= 0.f) ? Vector(1, 0, 0) : Vector(-1, 0, 0);
+	}
+	else {
+		tL = ty_max;
+		face_out = (b >= 0.f) ? Vector(0, 1, 0) : Vector(0, -1, 0);
+	}
+	if (tz_max < tL) {
+		tL = tz_max;
+		face_out = (c >= 0.f) ? Vector(0, 0, 1) : Vector(0, 0, -1);
+	}
+	
+	//hit condition
+	if (tE < tL && tL > 0) { 
+		if (tE > 0) {		//ray hits outside the surface
+			t = tE;
+			Normal = face_in;
+		}
+		else {		//ray hits inside the surface
+			t = tL;
+			Normal = face_out;
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 Vector aaBox::getNormal(Vector point)
