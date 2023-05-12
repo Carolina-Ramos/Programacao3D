@@ -554,7 +554,7 @@ void renderScene()
 
 			Color color = { 0, 0, 0 };
 
-			//distributed ray-tracing
+			//distributed ray-tracing (anti aliasing)
 			if (spp != 0){ 
 				for (int p = 0; p < n; p++) {
 					for (int q = 0; q < n; q++) {

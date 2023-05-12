@@ -85,7 +85,7 @@ public:
 	{
 		Vector ray_dir;
 		Vector eye_offset;
-		Vector p = { lens_sample.x * focal_ratio, lens_sample.y * focal_ratio, - (focal_ratio * lens_sample.z) }; //DOUBT ABOUT ls
+		Vector p = { pixel_sample.x * focal_ratio, pixel_sample.y * focal_ratio, focal_ratio * pixel_sample.z }; //DOUBT ABOUT ls and -f / -d
 
 		eye_offset = eye + u * lens_sample.x + v * lens_sample.y;
 		ray_dir = u * (p.x - lens_sample.x) + v * (p.y - lens_sample.y) + n * p.z;
