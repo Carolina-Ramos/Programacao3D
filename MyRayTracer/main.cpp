@@ -558,6 +558,7 @@ void renderScene()
 			if (spp != 0){ 
 				for (int p = 0; p < n; p++) {
 					for (int q = 0; q < n; q++) {
+
 						Vector pixel;  //viewport coordinates
 						pixel.x = x + (p + rand_float()) / n;
 						pixel.y = y + (q + rand_float()) / n;
