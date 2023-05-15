@@ -1,4 +1,4 @@
- ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 // P3D Course
 // (c) 2021 by João Madeiras Pereira
@@ -56,13 +56,13 @@ char s[32];
 
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
-float *colors;
-float *vertices;
+float* colors;
+float* vertices;
 int size_vertices;
 int size_colors;
 
 //Array of Pixels to be stored in a file by using DevIL library
-uint8_t *img_Data;
+uint8_t* img_Data;
 
 GLfloat m[16];  //projection matrix initialized by ortho function
 
@@ -88,7 +88,7 @@ int WindowHandle = 0;
 bool isOpenGLError() {
 	bool isError = false;
 	GLenum errCode;
-	const GLubyte *errString;
+	const GLubyte* errString;
 	while ((errCode = glGetError()) != GL_NO_ERROR) {
 		isError = true;
 		errString = gluErrorString(errCode);
@@ -99,7 +99,7 @@ bool isOpenGLError() {
 
 void checkOpenGLError(std::string error)
 {
-	if(isOpenGLError()) {
+	if (isOpenGLError()) {
 		std::cerr << error << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -154,7 +154,7 @@ void createShaderProgram()
 
 	glBindAttribLocation(ProgramId, VERTEX_COORD_ATTRIB, "in_Position");
 	glBindAttribLocation(ProgramId, COLOR_ATTRIB, "in_Color");
-	
+
 	glLinkProgram(ProgramId);
 	UniformId = glGetUniformLocation(ProgramId, "Matrix");
 
@@ -188,17 +188,17 @@ void createBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, size_vertices, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glVertexAttribPointer(VERTEX_COORD_ATTRIB, 2, GL_FLOAT, 0, 0, 0);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
 	glBufferData(GL_ARRAY_BUFFER, size_colors, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(COLOR_ATTRIB);
 	glVertexAttribPointer(COLOR_ATTRIB, 3, GL_FLOAT, 0, 0, 0);
-	
-// unbind the VAO
+
+	// unbind the VAO
 	glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
-//	glDisableVertexAttribArray(COLOR_ATTRIB);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
+	//	glDisableVertexAttribArray(COLOR_ATTRIB);
 	checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
@@ -206,7 +206,7 @@ void destroyBufferObjects()
 {
 	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glDisableVertexAttribArray(COLOR_ATTRIB);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -229,7 +229,7 @@ void drawPoints()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size_colors, colors);
 
 	glUniformMatrix4fv(UniformId, 1, GL_FALSE, m);
-	glDrawArrays(GL_POINTS, 0, RES_X*RES_Y);
+	glDrawArrays(GL_POINTS, 0, RES_X * RES_Y);
 	glFinish();
 
 	glUseProgram(0);
@@ -239,7 +239,7 @@ void drawPoints()
 	checkOpenGLError("ERROR: Could not draw scene.");
 }
 
-ILuint saveImgFile(const char *filename) {
+ILuint saveImgFile(const char* filename) {
 	ILuint ImageId;
 
 	ilEnable(IL_FILE_OVERWRITE);
@@ -277,8 +277,8 @@ void cleanup()
 	destroyBufferObjects();
 }
 
-void ortho(float left, float right, float bottom, float top, 
-			float nearp, float farp)
+void ortho(float left, float right, float bottom, float top,
+	float nearp, float farp)
 {
 	m[0 * 4 + 0] = 2 / (right - left);
 	m[0 * 4 + 1] = 0.0;
@@ -300,7 +300,7 @@ void ortho(float left, float right, float bottom, float top,
 
 void reshape(int w, int h)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, w, h);
 	ortho(0, (float)RES_X, 0, (float)RES_Y, -1.0, 1.0);
 }
@@ -309,23 +309,23 @@ void processKeys(unsigned char key, int xx, int yy)
 {
 	switch (key) {
 
-		case 27:
-			glutLeaveMainLoop();
-			break;
+	case 27:
+		glutLeaveMainLoop();
+		break;
 
-		case 'r':
-			camX = Eye.x;
-			camY = Eye.y;
-			camZ = Eye.z;
-			r = Eye.length();
-			beta = asinf(camY / r) * 180.0f / 3.14f;
-			alpha = atanf(camX / camZ) * 180.0f / 3.14f;
-			break;
+	case 'r':
+		camX = Eye.x;
+		camY = Eye.y;
+		camZ = Eye.z;
+		r = Eye.length();
+		beta = asinf(camY / r) * 180.0f / 3.14f;
+		alpha = atanf(camX / camZ) * 180.0f / 3.14f;
+		break;
 
-		case 'c':
-			printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
-			printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
-			break;
+	case 'c':
+		printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
+		printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
+		break;
 	}
 }
 
@@ -416,34 +416,34 @@ void mouseWheel(int wheel, int direction, int x, int y) {
 
 void setupGLEW() {
 	glewExperimental = GL_TRUE;
-	GLenum result = glewInit() ; 
-	if (result != GLEW_OK) { 
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
 		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
 		exit(EXIT_FAILURE);
-	} 
+	}
 	GLenum err_code = glGetError();
-	printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	printf ("Version: %s\n", glGetString (GL_VERSION));
-	printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+	printf("Vendor: %s\n", glGetString(GL_VENDOR));
+	printf("Renderer: %s\n", glGetString(GL_RENDERER));
+	printf("Version: %s\n", glGetString(GL_VERSION));
+	printf("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 void setupGLUT(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	
+
 	glutInitContextVersion(4, 3);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-	
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
 	glutInitWindowPosition(100, 250);
 	glutInitWindowSize(RES_X, RES_Y);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glDisable(GL_DEPTH_TEST);
 	WindowHandle = glutCreateWindow(CAPTION);
-	if(WindowHandle < 1) {
+	if (WindowHandle < 1) {
 		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -459,32 +459,55 @@ Vector reflect(Vector& I, Vector& N) {
 	return  Vector(b.x * N.x, b.y * N.y, b.z * N.z);
 }
 
+Vector refract(Vector I, Vector N, float ior) {
+	float cosi = clamp(-1, 1, I * N);
+	float etai = 1, etat = ior;
+	Vector n = N;
+	if (cosi < 0) { cosi = -cosi; }
+	else { std::swap(etai, etat); n = N* -1; }
+	float eta = etai / etat;
+	float k = 1 - eta * eta * (1 - cosi * cosi);
+	return k < 0 ? Vector(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
+}
+float calculateSchlickApproximation(Vector I, Vector N, float ior)
+{
+	float cosi = clamp(-1, 1, I* N);
+	float etai = 1, etat = ior;
+	if (cosi > 0) { std::swap(etai, etat); }
+	// Compute sini using Snell's law
+	float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
+	// Total internal reflection
+	if (sint >= 1) {
+		return 1;
+	}
+	else {
+		float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+		cosi = fabsf(cosi);
+		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+		return  (Rs * Rs + Rp * Rp) / 2;
+	}
+}
+
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
-
 	int numObjs = scene->getNumObjects();
 	int numLights = scene->getNumLights();
-	Color finalColor(0.0f, 0.0f, 0.0f);
+	Object* obj;
+	Light* light;
+	float dist, minDist = FLT_MAX;
+	int minIndex = -1;
 
-	float multiplier = 1.0f;
-
-	for (int i = 0; i < MAX_DEPTH; i++) {
-	
-		Object* obj;
-		Light* light;
-		float dist, minDist = FLT_MAX;
-		int minIndex = -1;
-
-		for (int i = 0; i < numObjs; i++) {
-			obj = scene->getObject(i);
-			bool interception = obj->intercepts(ray, dist);
-			if (interception) {
-				if (dist < minDist) {
-					minDist = dist;
-					minIndex = i;
-				}
+	for (int i = 0; i < numObjs; i++) {
+		obj = scene->getObject(i);
+		bool interception = obj->intercepts(ray, dist);
+		if (interception) {
+			if (dist < minDist) {
+				minDist = dist;
+				minIndex = i;
 			}
 		}
+	}
 
 		if (minIndex == -1) {
 			finalColor += scene->GetBackgroundColor() * multiplier;
@@ -510,26 +533,45 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						continue; // Skip object we are checking intersection against
 					}
 
-					obj = scene->getObject(i);
-					if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
-						inShadow = true;
-						break;
-					}
-				}
-				if (!inShadow) {
-					Vector h = (shadowDir - ray.direction).normalize();
-					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
-					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
-					color += light->color * (diffuse + specular);
+				obj = scene->getObject(i);
+				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+					inShadow = true;
+					break;
 				}
 			}
-			finalColor += color * multiplier;
-			multiplier *= m->GetReflection();
-			ray.origin = hitPoint + n * EPSILON;
-			ray.direction = reflect(ray.direction, n);
+			if (!inShadow) {
+				Vector h = (shadowDir - ray.direction).normalize();
+				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
+				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
+				color += light->color * (diffuse + specular);
+			}
 		}
+		if (depth >= MAX_DEPTH) {
+			return color;
+		}
+
+
+
+		float kr;
+		if (m->GetTransmittance() == 0.0f) {
+			kr = m->GetReflection();
+		}
+		else {
+			kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
+			Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
+			Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
+			color += refractionColor * (1 - kr);
+		}
+
+		if (m->GetReflection() >= 0.0f) {
+			Ray reflectionRay = Ray(hitPoint + n * 0.001f, reflect(ray.direction, n));
+			Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
+			color += reflectionColor * kr;
+		}
+
+
+		return color;
 	}
-	return finalColor;
 }
 
 
@@ -694,7 +736,7 @@ void init_scene(void)
 	printf("\nResolutionX = %d  ResolutionY= %d.\n", RES_X, RES_Y);
 
 	// Pixel buffer to be used in the Save Image function
-	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
+	img_Data = (uint8_t*)malloc(3 * RES_X * RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
 
 	Accel_Struct = scene->GetAccelStruct();   //Type of acceleration data structure
@@ -742,7 +784,7 @@ int main(int argc, char* argv[])
 	}
 	ilInit();
 
-	int 
+	int
 		ch;
 	if (!drawModeEnabled) {
 
@@ -759,14 +801,14 @@ int main(int argc, char* argv[])
 			delete(scene);
 			free(img_Data);
 			ch = _getch();
-		} while((toupper(ch) == 'Y')) ;
+		} while ((toupper(ch) == 'Y'));
 	}
 
 	else {   //Use OpenGL to draw image in the screen
 		printf("OPENGL DRAWING MODE\n\n");
 		init_scene();
-		size_vertices = 2 * RES_X*RES_Y * sizeof(float);
-		size_colors = 3 * RES_X*RES_Y * sizeof(float);
+		size_vertices = 2 * RES_X * RES_Y * sizeof(float);
+		size_colors = 3 * RES_X * RES_Y * sizeof(float);
 		vertices = (float*)malloc(size_vertices);
 		if (vertices == NULL) exit(1);
 		colors = (float*)malloc(size_colors);

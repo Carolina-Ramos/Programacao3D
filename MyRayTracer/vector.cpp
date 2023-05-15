@@ -36,13 +36,20 @@ Vector Vector::operator+(const  Vector& v )
 {
 	return Vector( x + v.x, y + v.y, z + v.z );
 }
+Vector Vector::operator+(const  float& v)
+{
+	return Vector(x + v, y + v, z + v);
+}
 
 
 Vector Vector::operator-(const Vector& v )
 {
 	return Vector( x - v.x, y - v.y, z - v.z );
 }
-
+Vector Vector::operator-(const float& v)
+{
+	return Vector(x - v, y - v, z - v);
+}
 
 Vector Vector::operator*( float f )
 {
