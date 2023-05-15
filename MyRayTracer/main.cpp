@@ -469,6 +469,7 @@ Vector refract(Vector I, Vector N, float ior) {
 	float k = 1 - eta * eta * (1 - cosi * cosi);
 	return k < 0 ? Vector(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
 }
+
 float calculateSchlickApproximation(Vector I, Vector N, float ior)
 {
 	float cosi = clamp(-1, 1, I* N);
@@ -509,28 +510,25 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		}
 	}
 
-		if (minIndex == -1) {
-			return scene->GetBackgroundColor();
-		} else {
-			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
-			Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
-			Material* m = scene->getObject(minIndex)->GetMaterial();
-			
-			Color color(0.0f, 0.0f, 0.0f);
-			Color diffuse;
-			Vector shadowDir;
-			for (int l = 0; l < numLights; l++) {
-				bool inShadow = false;
-				light = scene->getLight(l);
-				shadowDir = (light->position - (hitPoint + n * EPSILON)).normalize();
-				float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
-				if(shadowDir * n <= 0){
-					continue;
-				}
-				for (int i = 0; i < numObjs; i++) {
-					if (i == minIndex) {
-						continue; // Skip object we are checking intersection against
-					}
+	if (minIndex == -1) {
+		return scene->GetBackgroundColor();
+	} 
+	else {
+		Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
+		Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
+		Material* m = scene->getObject(minIndex)->GetMaterial();
+		Color color(0.0f, 0.0f, 0.0f);
+		Vector shadowDir;
+
+		for (int l = 0; l < numLights; l++) {
+			bool inShadow = false;
+			light = scene->getLight(l);
+			shadowDir = (light->position - (hitPoint + n * EPSILON)).normalize();
+			float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
+
+			if (shadowDir * n <= 0) continue;
+			for (int i = 0; i < numObjs; i++) {
+				if (i == minIndex) continue; // Skip object we are checking intersection against
 
 				obj = scene->getObject(i);
 				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
@@ -545,11 +543,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				color += light->color * (diffuse + specular);
 			}
 		}
-		if (depth >= MAX_DEPTH) {
-			return color;
-		}
-
-
+		if (depth >= MAX_DEPTH) return color;
 
 		float kr;
 		if (m->GetTransmittance() == 0.0f) {
@@ -567,7 +561,6 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
 			color += reflectionColor * kr;
 		}
-
 
 		return color;
 	}
