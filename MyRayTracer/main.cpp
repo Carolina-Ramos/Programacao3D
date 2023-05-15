@@ -500,8 +500,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			for (int l = 0; l < numLights; l++) {
 				bool inShadow = false;
 				light = scene->getLight(l);
-				shadowDir = (light->position - hitPoint).normalize();
-				float shadowDist = (light->position - hitPoint).length();
+				shadowDir = (light->position - (hitPoint + n * EPSILON)).normalize();
+				float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
 				if(shadowDir * n <= 0){
 					continue;
 				}
@@ -525,7 +525,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 			finalColor += color * multiplier;
 			multiplier *= m->GetReflection();
-			ray.origin = hitPoint + n * 0.001f;
+			ray.origin = hitPoint + n * EPSILON;
 			ray.direction = reflect(ray.direction, n);
 		}
 	}
@@ -543,6 +543,9 @@ void renderScene()
 	unsigned int counter = 0;
 	int spp = scene->GetSamplesPerPixel();
 	int n = sqrt(spp);
+	float aperture = scene->GetCamera()->GetAperture();
+
+	set_rand_seed(time(NULL) * time(NULL));
 
 	if (drawModeEnabled) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -560,10 +563,13 @@ void renderScene()
 					for (int q = 0; q < n; q++) {
 
 						Vector pixel;  //viewport coordinates
-						pixel.x = x + (p + rand_float()) / n;
+						pixel.x = x + (p + rand_float()) / n; //DOUBT: just rand_float or seed to?
 						pixel.y = y + (q + rand_float()) / n;
 
-						Ray ray = scene->GetCamera()->PrimaryRay(pixel);
+						//Ray ray = scene->GetCamera()->PrimaryRay(pixel);
+
+						Vector lensSample = rnd_unit_disk() * aperture;
+						Ray ray = scene->GetCamera()->PrimaryRay(lensSample / 2, pixel);
 
 						color += rayTracing(ray, 1, 1.0).clamp();
 					}
@@ -578,6 +584,7 @@ void renderScene()
 
 				Ray ray = scene->GetCamera()->PrimaryRay(pixel); 
 				color = rayTracing(ray, 1, 1.0).clamp();
+
 			}
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
