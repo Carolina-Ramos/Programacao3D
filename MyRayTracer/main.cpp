@@ -27,7 +27,7 @@
 //Enable OpenGL drawing.  
 bool drawModeEnabled = true;
 
-bool P3F_scene = true; //choose between P3F scene or a built-in random scene
+bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -459,6 +459,36 @@ Vector reflect(Vector& I, Vector& N) {
 	return  Vector(b.x * N.x, b.y * N.y, b.z * N.z);
 }
 
+Vector refract(Vector I, Vector N, float ior) {
+	float cosi = clamp(-1, 1, I * N);
+	float etai = 1, etat = ior;
+	Vector n = N;
+	if (cosi < 0) { cosi = -cosi; }
+	else { std::swap(etai, etat); n = N* -1; }
+	float eta = etai / etat;
+	float k = 1 - eta * eta * (1 - cosi * cosi);
+	return k < 0 ? Vector(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
+}
+float calculateSchlickApproximation(Vector I, Vector N, float ior)
+{
+	float cosi = clamp(-1, 1, I* N);
+	float etai = 1, etat = ior;
+	if (cosi > 0) { std::swap(etai, etat); }
+	// Compute sini using Snell's law
+	float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
+	// Total internal reflection
+	if (sint >= 1) {
+		return 1;
+	}
+	else {
+		float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+		cosi = fabsf(cosi);
+		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+		return  (Rs * Rs + Rp * Rp) / 2;
+	}
+}
+
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
 	int numObjs = scene->getNumObjects();
@@ -488,7 +518,6 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Material* m = scene->getObject(minIndex)->GetMaterial();
 
 		Color color(0.0f, 0.0f, 0.0f);
-		Color diffuse;
 		Vector shadowDir;
 		for (int l = 0; l < numLights; l++) {
 			bool inShadow = false;
@@ -520,11 +549,26 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			return color;
 		}
 
+
+
+		float kr;
+		if (m->GetTransmittance() == 0.0f) {
+			kr = m->GetReflection();
+		}
+		else {
+			kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
+			Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
+			Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
+			color += refractionColor * (1 - kr);
+		}
+
 		if (m->GetReflection() >= 0.0f) {
 			Ray reflectionRay = Ray(hitPoint + n * 0.001f, reflect(ray.direction, n));
 			Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-			color += reflectionColor * m->GetReflection();
+			color += reflectionColor * kr;
 		}
+
+
 		return color;
 	}
 }

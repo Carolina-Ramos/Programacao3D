@@ -21,7 +21,9 @@ public:
 
 	Vector operator=(const Vector& v);
 	Vector operator+( const Vector& v );
-	Vector operator-( const Vector& v );
+	Vector operator+( const float& v );
+	Vector operator-( const Vector& v );	
+	Vector operator-(const float& v);
 	Vector operator*( float f );
 	float  operator*(const Vector& v);   //inner product
 	Vector operator/( float f );
