@@ -510,8 +510,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	}
 
 		if (minIndex == -1) {
-			finalColor += scene->GetBackgroundColor() * multiplier;
-			break;
+			return scene->GetBackgroundColor();
 		} else {
 			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
 			Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
