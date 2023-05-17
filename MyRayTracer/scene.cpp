@@ -12,12 +12,24 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	points[0] = P0; points[1] = P1; points[2] = P2;
 
 	/* Calculate the normal */
-	normal = Vector(0, 0, 0);
+	Vector AB = P1 - P0;
+	Vector AC = P2 - P0;
+	normal = AB % AC;
 	normal.normalize();
 
-	//YOUR CODE to Calculate the Min and Max for bounding box
+	//Calculate the Min and Max for bounding box
 	Min = Vector(+FLT_MAX, +FLT_MAX, +FLT_MAX);
 	Max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+
+	for (int i = 0; i < 3; i++) {
+		if (points[i].x < Min.x) Min.x = points[i].x;
+		if (points[i].x > Max.x) Max.x = points[i].x;
+		if (points[i].y < Min.y) Min.y = points[i].y;
+		if (points[i].y > Max.y) Max.y = points[i].y;
+		if (points[i].z < Min.z) Min.z = points[i].z;
+		if (points[i].z > Max.z) Max.z = points[i].z;
+	}
 
 
 	// enlarge the bounding box a bit just in case...

@@ -597,13 +597,13 @@ void renderScene()
 					for (int q = 0; q < n; q++) {
 
 						Vector pixel;  //viewport coordinates
-						pixel.x = x + (p + rand_float()) / n; //DOUBT: just rand_float or seed to?
+						pixel.x = x + (p + rand_float()) / n;
 						pixel.y = y + (q + rand_float()) / n;
 
 						//Ray ray = scene->GetCamera()->PrimaryRay(pixel);
 
 						Vector lensSample = rnd_unit_disk() * aperture;
-						Ray ray = scene->GetCamera()->PrimaryRay(lensSample / 2, pixel);
+						Ray ray = scene->GetCamera()->PrimaryRay(lensSample / 2, pixel); // divide by 2 because aperture is diameter, not ray
 
 						color += rayTracing(ray, 1, 1.0).clamp();
 					}
