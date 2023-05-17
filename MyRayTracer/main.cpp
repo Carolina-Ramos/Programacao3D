@@ -27,7 +27,7 @@
 //Enable OpenGL drawing.  
 bool drawModeEnabled = true;
 
-bool P3F_scene = true; //choose between P3F scene or a built-in random scene
+bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -453,10 +453,7 @@ void setupGLUT(int argc, char* argv[])
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
 Vector reflect(Vector& I, Vector& N) {
-	Vector a = Vector(I.x - 2.0f, I.y - 2.0f, I.z - 2.0f);
-	float dot = I * N;
-	Vector b = Vector(a.x * dot, a.y * dot, a.z * dot);
-	return  Vector(b.x * N.x, b.y * N.y, b.z * N.z);
+	return N * ((I * -1) * N) * 2 + I;
 }
 
 Vector refract(Vector I, Vector N, float ior) {
