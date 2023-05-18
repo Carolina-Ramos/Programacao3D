@@ -644,9 +644,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 
 			if (m->GetReflection() >= 0.0f) {
-				Ray reflectionRay = Ray(hitPoint + n * 0.001f, reflect(ray.direction, n));
-				Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-				color += reflectionColor * kr;
+				bool hasReflection = false;
+				Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
+				if (hasReflection) {
+					Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
+					Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
+					color += reflectionColor * kr * m->GetSpecColor();
+				}
 			}
 
 			return color;
