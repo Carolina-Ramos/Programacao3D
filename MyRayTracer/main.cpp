@@ -452,8 +452,18 @@ void setupGLUT(int argc, char* argv[])
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
-Vector reflect(Vector& I, Vector& N) {
-	return N * ((I * -1) * N) * 2 + I;
+Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection) {
+	Vector R = N * ((I * -1) * N) * 2 + I;
+	Vector S = hitpoint + R + rnd_unit_sphere()* 0.0f;
+	Vector reflect = (S - hitpoint).normalize();
+	if (reflect * N > 0) {
+		hasReflection = true;
+		return reflect;
+	}
+	else {
+		hasReflection = false;
+		return Vector(0, 0, 0);
+	}
 }
 
 Vector refract(Vector I, Vector N, float ior) {
@@ -568,9 +578,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 
 			if (m->GetReflection() >= 0.0f) {
-				Ray reflectionRay = Ray(hitPoint + n * 0.001f, reflect(ray.direction, n));
-				Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-				color += reflectionColor * kr;
+				bool hasReflection = false;
+				Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
+				if (hasReflection) {			
+					Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
+					Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
+					color += reflectionColor * kr * m->GetSpecColor();
+				}
 			}
 
 			return color;
