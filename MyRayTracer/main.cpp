@@ -27,7 +27,7 @@
 //Enable OpenGL drawing.  
 bool drawModeEnabled = true;
 
-bool P3F_scene = false; //choose between P3F scene or a built-in random scene
+bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -492,7 +492,6 @@ Color rayTracingShadows(Ray ray, Color color, int numObjs, float minDist, int mi
 	Light* light;
 	Object* obj;
 	Vector shadowDir;
-	//Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
 
 	for (int l = 0; l < numLights; l++) {
 		bool inShadow = false;
@@ -531,6 +530,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Color color(0.0f, 0.0f, 0.0f);
 
 	if (Accel_Struct == NONE) {
+		//is an object intersected
 		for (int i = 0; i < numObjs; i++) {
 			obj = scene->getObject(i);
 			bool interception = obj->intercepts(ray, dist);
@@ -541,9 +541,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				}
 			}
 		}
-
+		//no object intersected
 		if (minIndex == -1) {
-			return scene->GetBackgroundColor();
+			if (skybox_flag) color = scene->GetSkyboxColor(ray);
+			else color = scene->GetBackgroundColor();
+			return color;
 		}
 		else {
 			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
@@ -574,21 +576,45 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			return color;
 		}
 	}
-	/*else if (Accel_Struct == GRID_ACC) {
+	else if (Accel_Struct == GRID_ACC) {
 		Object* hitObject = NULL;
-		Vector interceptionPoint;
-		Color color_acc;
-		if (!grid_ptr->Traverse(ray, &hitObject, interceptionPoint)) {
-			if (skybox_flag) color_acc = scene->GetSkyboxColor(ray);
-			else color_acc = scene->GetBackgroundColor();
-			return color_acc;
+		Vector hitPoint;
+		
+		if (!grid_ptr->Traverse(ray, &hitObject, hitPoint)) {
+			if (skybox_flag) color = scene->GetSkyboxColor(ray);
+			else color = scene->GetBackgroundColor();
+			return color;
 		}
 		else {
-			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
-			Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
-			Material* m = scene->getObject(minIndex)->GetMaterial();
+			Vector n = hitObject->getNormal(hitPoint).normalize();
+			Material* m = hitObject->GetMaterial();
 
-			color = rayTracingShadows(ray, color, numObjs, minDist, minIndex, m, n, hitPoint);
+			int numLights = scene->getNumLights();
+			Light* light;
+			Object* obj;
+			Vector shadowDir;
+
+			for (int l = 0; l < numLights; l++) {
+				bool inShadow = false;
+				light = scene->getLight(l);
+				shadowDir = (light->position - (hitPoint + n * EPSILON));
+				float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
+				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+
+				if (shadowDir.normalize() * n <= 0) continue;
+				if(grid_ptr->Traverse(shadowRay)) {
+					inShadow = true;
+					break;
+				}
+
+				if (!inShadow) {
+					Vector h = (shadowDir - ray.direction).normalize();
+					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
+					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
+					color += light->color * (diffuse + specular);
+				}
+
+			}
 
 			if (depth >= MAX_DEPTH) return color;
 
@@ -611,9 +637,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 			return color;
 		}
-	}*/
-
-	
+	}
 }
 
 
