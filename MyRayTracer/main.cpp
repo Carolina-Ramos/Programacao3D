@@ -497,40 +497,8 @@ float calculateSchlickApproximation(Vector I, Vector N, float ior)
 	}
 }
 
-Color rayTracingShadows(Ray ray, Color color, int numObjs, float minDist, int minIndex, Material *m, Vector n, Vector hitPoint) {
-	int numLights = scene->getNumLights();
-	Light* light;
-	Object* obj;
-	Vector shadowDir;
+Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of medium 1 where the ray is travelling
 
-	for (int l = 0; l < numLights; l++) {
-		bool inShadow = false;
-		light = scene->getLight(l);
-		shadowDir = (light->position - (hitPoint + n * EPSILON)).normalize();
-		float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
-
-		if (shadowDir * n <= 0) continue;
-		for (int i = 0; i < numObjs; i++) {
-			if (i == minIndex) continue; // Skip object we are checking intersection against
-
-			obj = scene->getObject(i);
-			if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
-				inShadow = true;
-				break;
-			}
-		}
-		if (!inShadow) {
-			Vector h = (shadowDir - ray.direction).normalize();
-			Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
-			Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
-			color += light->color * (diffuse + specular);
-		}
-	}
-	return color;
-}
-
-Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
-{
 	int numObjs = scene->getNumObjects();
 	Object* obj;
 	float dist, minDist = FLT_MAX;
@@ -538,10 +506,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Accel_Struct = scene->GetAccelStruct();
 	bool skybox_flag = scene->GetSkyBoxFlg();
 	Color color(0.0f, 0.0f, 0.0f);
+	Vector hitPoint;
+	Object* hitObject = NULL;
 
 	if (Accel_Struct == NONE) {
-		//is an object intersected
-		for (int i = 0; i < numObjs; i++) {
+		
+		for (int i = 0; i < numObjs; i++) { //is an object intersected
 			obj = scene->getObject(i);
 			bool interception = obj->intercepts(ray, dist);
 			if (interception) {
@@ -551,111 +521,104 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				}
 			}
 		}
-		//no object intersected
-		if (minIndex == -1) {
+
+		if (minIndex == -1) { //no object intersected
 			if (skybox_flag) color = scene->GetSkyboxColor(ray);
 			else color = scene->GetBackgroundColor();
 			return color;
 		}
 		else {
-			Vector hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
-			Vector n = scene->getObject(minIndex)->getNormal(hitPoint).normalize();
-			Material* m = scene->getObject(minIndex)->GetMaterial();
-
-			color = rayTracingShadows(ray, color, numObjs, minDist, minIndex, m, n, hitPoint);
-
-			if (depth >= MAX_DEPTH) return color;
-
-			float kr;
-			if (m->GetTransmittance() == 0.0f) {
-				kr = m->GetReflection();
-			}
-			else {
-				kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
-				Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
-				Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
-				color += refractionColor * (1 - kr);
-			}
-
-			if (m->GetReflection() >= 0.0f) {
-				bool hasReflection = false;
-				Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
-				if (hasReflection) {			
-					Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
-					Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-					color += reflectionColor * kr * m->GetSpecColor();
-				}
-			}
-
-			return color;
+			hitPoint = ray.origin + ray.direction * minDist; //point to shoot the shadow ray from
+			hitObject = scene->getObject(minIndex);
 		}
 	}
 	else if (Accel_Struct == GRID_ACC) {
-		Object* hitObject = NULL;
-		Vector hitPoint;
-		
+
 		if (!grid_ptr->Traverse(ray, &hitObject, hitPoint)) {
 			if (skybox_flag) color = scene->GetSkyboxColor(ray);
 			else color = scene->GetBackgroundColor();
 			return color;
 		}
-		else {
-			Vector n = hitObject->getNormal(hitPoint).normalize();
-			Material* m = hitObject->GetMaterial();
+	}
+	else if (Accel_Struct == BVH_ACC) {
 
-			int numLights = scene->getNumLights();
-			Light* light;
-			Object* obj;
-			Vector shadowDir;
-
-			for (int l = 0; l < numLights; l++) {
-				bool inShadow = false;
-				light = scene->getLight(l);
-				shadowDir = (light->position - (hitPoint + n * EPSILON));
-				float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
-				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
-
-				if (shadowDir.normalize() * n <= 0) continue;
-				if(grid_ptr->Traverse(shadowRay)) {
-					inShadow = true;
-					break;
-				}
-
-				if (!inShadow) {
-					Vector h = (shadowDir - ray.direction).normalize();
-					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
-					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
-					color += light->color * (diffuse + specular);
-				}
-
-			}
-
-			if (depth >= MAX_DEPTH) return color;
-
-			float kr;
-			if (m->GetTransmittance() == 0.0f) {
-				kr = m->GetReflection();
-			}
-			else {
-				kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
-				Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
-				Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
-				color += refractionColor * (1 - kr);
-			}
-
-			if (m->GetReflection() >= 0.0f) {
-				bool hasReflection = false;
-				Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
-				if (hasReflection) {
-					Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
-					Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-					color += reflectionColor * kr * m->GetSpecColor();
-				}
-			}
-
+		if (!bvh_ptr->Traverse(ray, &hitObject, hitPoint)) {
+			if (skybox_flag) color = scene->GetSkyboxColor(ray);
+			else color = scene->GetBackgroundColor();
 			return color;
 		}
 	}
+
+	Vector n = hitObject->getNormal(hitPoint).normalize();
+	Material* m = hitObject->GetMaterial();
+	Light* light;
+	Vector shadowDir;
+	int numLights = scene->getNumLights();
+
+	for (int l = 0; l < numLights; l++) {
+		bool inShadow = false;
+		light = scene->getLight(l);
+		float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
+		shadowDir = (light->position - (hitPoint + n * EPSILON));
+		
+		if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
+
+		if (shadowDir.normalize() * n <= 0) continue;
+
+		if (Accel_Struct == NONE) {
+			for (int i = 0; i < numObjs; i++) {
+				if (i == minIndex) continue; // Skip object we are checking intersection against
+
+				obj = scene->getObject(i);
+				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+					inShadow = true;
+					break;
+				}
+			}
+		}
+		else if (Accel_Struct == GRID_ACC) {
+			Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+
+			if (grid_ptr->Traverse(shadowRay)) {
+				inShadow = true;
+				break;
+			}
+		}
+
+		if (!inShadow) {
+			Vector h = (shadowDir - ray.direction).normalize();
+			Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
+			Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
+			color += light->color * (diffuse + specular);
+		}
+
+	}
+
+	if (depth >= MAX_DEPTH) return color;
+
+	float kr;
+
+	if (m->GetTransmittance() == 0.0f) {
+		kr = m->GetReflection();
+	}
+	else {
+		kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
+		Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
+		Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
+		color += refractionColor * (1 - kr);
+	}
+
+	if (m->GetReflection() >= 0.0f) {
+		bool hasReflection = false;
+		Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
+		if (hasReflection) {
+			Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
+			Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
+			color += reflectionColor * kr * m->GetSpecColor();
+		}
+	}
+
+	return color;
 }
 
 

@@ -52,9 +52,13 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		//right_index, left_index and split_index refer to the indices in the objects vector
 	   // do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
 	    // node.index can have a index of objects vector or a index of nodes vector
-			
 		
-	}
+	/*if ((right_index - left_index) <= Threshold) node->makeLeaf(left_index, right_index);
+	else {
+
+	}*/
+		
+}
 
 bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			float tmp;
