@@ -72,6 +72,7 @@ private:
 	int Threshold = 2;
 	vector<Object*> objects;
 	vector<BVH::BVHNode*> nodes;
+	int times = 0;
 
 	struct StackItem {
 		BVHNode* ptr;
@@ -89,5 +90,7 @@ public:
 	void build_recursive(int left_index, int right_index, BVHNode* node);
 	bool Traverse(Ray& ray, Object** hit_obj, Vector& hit_point);
 	bool Traverse(Ray& ray);
+	int getLongestAxis(BVHNode* node, float& midPoint);
+	int medianSplit(int left_index, int right_index, int dimension);
 };
 #endif

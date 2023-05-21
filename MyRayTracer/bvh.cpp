@@ -1,5 +1,6 @@
 #include "rayAccelerator.h"
 #include "macros.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -27,36 +28,113 @@ int BVH::getNumObjects() { return objects.size(); }
 
 void BVH::Build(vector<Object *> &objs) {
 
-		
-			BVHNode *root = new BVHNode();
+	BVHNode *root = new BVHNode();
+	
+	Vector min = Vector(FLT_MAX, FLT_MAX, FLT_MAX), max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	AABB world_bbox = AABB(min, max);
+	
+	for (Object* obj : objs) {
+		AABB bbox = obj->GetBoundingBox();
+		world_bbox.extend(bbox);
+		objects.push_back(obj);
+	}
+	world_bbox.min.x -= EPSILON; world_bbox.min.y -= EPSILON; world_bbox.min.z -= EPSILON;
+	world_bbox.max.x += EPSILON; world_bbox.max.y += EPSILON; world_bbox.max.z += EPSILON;
+	root->setAABB(world_bbox);
+	nodes.push_back(root);
+	build_recursive(0, objects.size(), root); // -> root node takes all the 
+}
 
-			Vector min = Vector(FLT_MAX, FLT_MAX, FLT_MAX), max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-			AABB world_bbox = AABB(min, max);
+int BVH::getLongestAxis(BVHNode* node, float& midPoint) {
+	int axisIndex; 
+	float axisDist;
+	AABB box = node->getAABB();
 
-			for (Object* obj : objs) {
-				AABB bbox = obj->GetBoundingBox();
-				world_bbox.extend(bbox);
-				objects.push_back(obj);
-			}
-			world_bbox.min.x -= EPSILON; world_bbox.min.y -= EPSILON; world_bbox.min.z -= EPSILON;
-			world_bbox.max.x += EPSILON; world_bbox.max.y += EPSILON; world_bbox.max.z += EPSILON;
-			root->setAABB(world_bbox);
-			nodes.push_back(root);
-			build_recursive(0, objects.size(), root); // -> root node takes all the 
-		}
+	if ((box.max.x - box.min.x) < (box.max.y - box.min.y)) {
+		axisIndex = 1;
+		axisDist = box.max.y - box.min.y;
+		midPoint = (box.max.y + box.min.y) / 2;
+	}
+	else {
+		axisIndex = 0;
+		axisDist = box.max.x - box.min.x;
+		midPoint = (box.max.x + box.min.x) / 2;
+	}
+	if ((box.max.z - box.min.z) > axisDist) {
+		axisIndex = 2;
+		axisDist = box.max.z - box.min.z;
+		midPoint = (box.max.z + box.min.z) / 2;
+	}
+
+	return axisIndex;
+}
+
+int BVH::medianSplit(int left_index, int right_index, int dimension) {
+	int numObjs = right_index - left_index;
+	int halfObjects = floor(numObjs / 2.f);
+	return left_index + halfObjects;
+}
 
 void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
-	   //PUT YOUR CODE HERE
+	//PUT YOUR CODE HERE
+	//right_index, left_index and split_index refer to the indices in the objects vector
+	// do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
+	// node.index can have a index of objects vector or a index of nodes vector
 
-
-		//right_index, left_index and split_index refer to the indices in the objects vector
-	   // do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
-	    // node.index can have a index of objects vector or a index of nodes vector
-		
-	/*if ((right_index - left_index) <= Threshold) node->makeLeaf(left_index, right_index);
+	Comparator cmp;
+	AABB boxLeft, boxRight;
+	float midPoint;
+	Vector min = Vector(FLT_MAX, FLT_MAX, FLT_MAX);
+	Vector max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	int split_index;
+	bool initialized = false;
+	
+	if ((right_index - left_index) <= Threshold) //check if number of objects in the box is not less than threshold
+		node->makeLeaf(left_index, right_index - left_index);
 	else {
 
-	}*/
+		cmp.dimension = getLongestAxis(node, midPoint);
+		std::sort(objects.begin() + left_index, objects.begin() + right_index, cmp);
+
+		for (int i = left_index; i < right_index; i++) {
+			if (objects[i]->GetBoundingBox().centroid().getAxisValue(cmp.dimension) > midPoint) {
+				split_index = i;
+				initialized = true;
+				break;
+			}
+			else
+				continue;
+		}
+		if (!initialized)
+			split_index = medianSplit(left_index, right_index, cmp.dimension);
+
+		node->makeNode(nodes.size());
+
+		//Left Node
+		BVHNode* leftNode = new BVHNode();
+		boxLeft = AABB(min, max);
+		for (int i = left_index; i < split_index; i++) {
+			AABB bboxL = objects[i]->GetBoundingBox();
+			boxLeft.extend(bboxL);
+		}
+		leftNode->setAABB(boxLeft);
+
+		//Right Node
+		BVHNode* rightNode = new BVHNode();
+		boxRight = AABB(min, max);
+		for (int i = split_index; i < right_index; i++) {
+			AABB bboxR = objects[i]->GetBoundingBox();
+			boxRight.extend(bboxR);
+		}
+		rightNode->setAABB(boxRight);
+
+		//node->makeNode(nodes.size());
+		nodes.push_back(leftNode);
+		nodes.push_back(rightNode);
+
+		build_recursive(left_index, split_index, leftNode);
+		build_recursive(split_index, right_index, rightNode);
+	}
 		
 }
 
