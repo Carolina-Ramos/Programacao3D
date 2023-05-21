@@ -451,6 +451,15 @@ void setupGLUT(int argc, char* argv[])
 
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
+Vector random_point_on_light(Light* light) {
+	// Generate a random point on the surface of the area light
+	float u = rand_float();
+	float v = rand_float();
+
+	Vector position = light->position + 0.5f * (u + 0.5f) + 0.5f * (v + 0.5f);
+
+	return position;
+}
 
 Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection) {
 	Vector R = N * ((I * -1) * N) * 2 + I;
@@ -496,6 +505,40 @@ float calculateSchlickApproximation(Vector I, Vector N, float ior)
 		return  (Rs * Rs + Rp * Rp) / 2;
 	}
 }
+
+bool is_shadowed(Vector lightPos, Vector point) {
+	Vector shadowDir = (lightPos - point).normalize();
+	Ray shadowRay(point + shadowDir * EPSILON, shadowDir);
+	int numObjs = scene->getNumObjects();
+	Object* obj;
+
+	for (int i = 0; i < numObjs; i++) {
+		obj = scene->getObject(i);
+		float dist;
+		if (obj->intercepts(shadowRay, dist)) {
+			return true; // point is in shadow
+		}
+	}
+
+	return false; // point is not in shadow
+}
+
+float calculate_intensity(Light* light, Vector hitPoint) {
+	float total = 0.0f;
+	int numSamples = 4;
+
+	for (int v = 0; v < 2; v++) {
+		for (int u = 0; u < 2; u++) {
+			Vector lightPosition = random_point_on_light(light);
+			if (!is_shadowed(lightPosition, hitPoint)) {
+				total += 1.0f;
+			}
+		}
+	}
+
+	return total / (numSamples * numSamples);
+}
+
 
 Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of medium 1 where the ray is travelling
 
@@ -552,54 +595,61 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 	Vector n = hitObject->getNormal(hitPoint).normalize();
 	Material* m = hitObject->GetMaterial();
 	Light* light;
+	Vector lightPos;
 	Vector shadowDir;
 	int numLights = scene->getNumLights();
+	int numSamples = 2;
 
 	for (int l = 0; l < numLights; l++) {
 		bool inShadow = false;
 		light = scene->getLight(l);
-		float shadowDist = (light->position - (hitPoint + n * EPSILON)).length();
-		shadowDir = (light->position - (hitPoint + n * EPSILON));
-		
-		if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
 
-		if (shadowDir.normalize() * n <= 0) continue;
+		for (int p = 0; p < numSamples; p++) {
+			lightPos = random_point_on_light(light);
+			float shadowDist = (lightPos - (hitPoint + n * EPSILON)).length();
+			shadowDir = (lightPos - (hitPoint + n * EPSILON));
 
-		if (Accel_Struct == NONE) {
-			for (int i = 0; i < numObjs; i++) {
-				if (i == minIndex) continue; // Skip object we are checking intersection against
+			if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
 
-				obj = scene->getObject(i);
-				if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+			if (shadowDir.normalize() * n <= 0) continue;
+
+			float intensity = calculate_intensity(light, hitPoint);
+
+			if (Accel_Struct == NONE) {
+				for (int i = 0; i < numObjs; i++) {
+					if (i == minIndex) continue; // Skip object we are checking intersection against
+
+					obj = scene->getObject(i);
+					if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+						inShadow = true;
+						break;
+					}
+				}
+			}
+			else if (Accel_Struct == GRID_ACC) {
+				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+
+				if (grid_ptr->Traverse(shadowRay)) {
 					inShadow = true;
 					break;
 				}
 			}
-		}
-		else if (Accel_Struct == GRID_ACC) {
-			Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+			else if (Accel_Struct == BVH_ACC) {
+				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
 
-			if (grid_ptr->Traverse(shadowRay)) {
-				inShadow = true;
-				break;
+				if (grid_ptr->Traverse(shadowRay)) {
+					inShadow = true;
+					break;
+				}
+			}
+
+			if (!inShadow) {
+				Vector h = (shadowDir - ray.direction).normalize();
+				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f) * intensity;
+				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine()) * intensity;
+				color += light->color * (diffuse + specular);
 			}
 		}
-		else if (Accel_Struct == BVH_ACC) {
-			Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
-
-			if (grid_ptr->Traverse(shadowRay)) {
-				inShadow = true;
-				break;
-			}
-		}
-
-		if (!inShadow) {
-			Vector h = (shadowDir - ray.direction).normalize();
-			Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
-			Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
-			color += light->color * (diffuse + specular);
-		}
-
 	}
 
 	if (depth >= MAX_DEPTH) return color;
