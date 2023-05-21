@@ -454,7 +454,7 @@ void setupGLUT(int argc, char* argv[])
 
 Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection) {
 	Vector R = N * ((I * -1) * N) * 2 + I;
-	Vector S = hitpoint + R + rnd_unit_sphere()* 0.0f;
+	Vector S = hitpoint + R + rnd_unit_sphere( )* 0.3f;
 	Vector reflect = (S - hitpoint).normalize();
 	if (reflect * N > 0) {
 		hasReflection = true;
@@ -466,35 +466,25 @@ Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection) {
 	}
 }
 
-Vector refract(Vector I, Vector N, float ior) {
-	float cosi = clamp(-1, 1, I * N);
-	float etai = 1, etat = ior;
-	Vector n = N;
-	if (cosi < 0) { cosi = -cosi; }
-	else { std::swap(etai, etat); n = N* -1; }
-	float eta = etai / etat;
-	float k = 1 - eta * eta * (1 - cosi * cosi);
-	return k < 0 ? Vector(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
+Vector refract(Vector I, Vector N, float snellLaw) {
+	I *= -1;
+	Vector viewNormal = (N * (I * N));
+	Vector viewTangent = viewNormal - I;
+	float cosOi = viewNormal.length();
+	float sinOt = snellLaw * viewTangent.length();
+	float insqrt = 1 - pow(sinOt, 2);	
+	float cosOt = sqrt(insqrt);
+	return (viewTangent.normalize() * sinOt + N * (-cosOt)).normalize();
+	
 }
 
-float calculateSchlickApproximation(Vector I, Vector N, float ior)
+float calculateSchlickApproximation(Vector I, Vector N, float ior1, float ior2)
 {
-	float cosi = clamp(-1, 1, I* N);
-	float etai = 1, etat = ior;
-	if (cosi > 0) { std::swap(etai, etat); }
-	// Compute sini using Snell's law
-	float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
-	// Total internal reflection
-	if (sint >= 1) {
-		return 1;
-	}
-	else {
-		float cost = sqrtf(std::max(0.f, 1 - sint * sint));
-		cosi = fabsf(cosi);
-		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-		return  (Rs * Rs + Rp * Rp) / 2;
-	}
+	I *= -1;
+	Vector viewNormal = (N * (I * N));
+	float cosOi = viewNormal.length();
+	float r0 = pow(((ior1 - ior2) / (ior1 + ior2)), 2);
+	return r0 + (1 - r0) * pow(1 - cosOi, 5);
 }
 
 Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of medium 1 where the ray is travelling
@@ -604,33 +594,43 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 	if (depth >= MAX_DEPTH) return color;
 
-	float kr;
+	Color tColor = Color(), rColor = Color();
 
-	if (m->GetTransmittance() == 0.0f) {
-		kr = m->GetReflection();
+	bool inside = false;
+	if (ray.direction * n > 0) {
+		inside = true;
+		n = n * -1;
+	}
+	float newIoR = !inside ? m->GetRefrIndex() : 1;
+	float kr; 
+
+	if (m->GetTransmittance() > 0) {
+		kr = calculateSchlickApproximation(ray.direction, n, ior_1, newIoR);
 	}
 	else {
-		kr = calculateSchlickApproximation(ray.direction, n, m->GetRefrIndex());
-		Ray refractionRay = Ray(hitPoint - n * 0.0001f, refract(refractionRay.direction, n, m->GetRefrIndex()));
-		Color refractionColor = rayTracing(refractionRay, depth + 1, ior_1);
-		color += refractionColor * (1 - kr);
+		kr = m->GetReflection();
 	}
 
-	if (m->GetReflection() >= 0.0f) {
+	if (m->GetReflection() > 0) {
 		bool hasReflection = false;
-		Vector rVector = reflect(ray.direction, n, hitPoint, hasReflection);
+		Vector rDir = reflect(ray.direction, n, hitPoint, hasReflection);
 		if (hasReflection) {
-			Ray reflectionRay = Ray(hitPoint + n * EPSILON, rVector);
-			Color reflectionColor = rayTracing(reflectionRay, depth + 1, ior_1);
-			color += reflectionColor * kr * m->GetSpecColor();
+			Ray rRay = Ray(hitPoint + n * EPSILON, rDir);
+			color += rayTracing(rRay, depth + 1, ior_1) * kr * m->GetSpecColor();
 		}
+	}
+
+	if (m->GetTransmittance() > 0) {
+		float snellLaw = !inside ? ior_1 / m->GetRefrIndex() : ior_1;
+		Vector tDir = refract(ray.direction, n, snellLaw);
+		Ray tRay = Ray(hitPoint + tDir * EPSILON, tDir);
+		color += rayTracing(tRay, depth + 1, newIoR) * (1 - kr);
 	}
 
 	return color;
 }
 
-
-
+ 
 // Render function by primary ray casting from the eye towards the scene's objects
 
 void renderScene()

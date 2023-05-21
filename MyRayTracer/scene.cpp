@@ -672,7 +672,7 @@ void Scene::create_random_scene() {
 	this->SetBackgroundColor(Color(0.5, 0.7, 1.0));
 	//this->LoadSkybox("skybox");
 	//this->SetSkyBoxFlg(true);
-	this->SetAccelStruct(BVH_ACC);
+	this->SetAccelStruct(NONE);
 	this->SetSamplesPerPixel(0);
 	
 	camera = new Camera(Vector(-5.312192, 4.456562, 11.963158), Vector(0.0, 0.0, 0), Vector(0.0, 1.0, 0.0), 45.0, 0.01, 10000.0, 512, 512, 0, 1.5f);
