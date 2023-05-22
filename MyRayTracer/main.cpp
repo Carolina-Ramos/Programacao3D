@@ -544,6 +544,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 	int numObjs = scene->getNumObjects();
 	Object* obj;
+	int spp = scene->GetSamplesPerPixel();
 	float dist, minDist = FLT_MAX;
 	int minIndex = -1;
 	Accel_Struct = scene->GetAccelStruct();
@@ -604,7 +605,55 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 		bool inShadow = false;
 		light = scene->getLight(l);
 
-		for (int p = 0; p < numSamples; p++) {
+		if (spp == 0) {
+			for (int p = 0; p < numSamples; p++) {
+				lightPos = random_point_on_light(light);
+				float shadowDist = (lightPos - (hitPoint + n * EPSILON)).length();
+				shadowDir = (lightPos - (hitPoint + n * EPSILON));
+
+				if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
+
+				if (shadowDir.normalize() * n <= 0) continue;
+
+				float intensity = 0.5f;
+
+				if (Accel_Struct == NONE) {
+					for (int i = 0; i < numObjs; i++) {
+						if (i == minIndex) continue; // Skip object we are checking intersection against
+
+						obj = scene->getObject(i);
+						if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+							inShadow = true;
+							break;
+						}
+					}
+				}
+				else if (Accel_Struct == GRID_ACC) {
+					Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+
+					if (grid_ptr->Traverse(shadowRay)) {
+						inShadow = true;
+						break;
+					}
+				}
+				else if (Accel_Struct == BVH_ACC) {
+					Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+
+					if (grid_ptr->Traverse(shadowRay)) {
+						inShadow = true;
+						break;
+					}
+				}
+
+				if (!inShadow) {
+					Vector h = (shadowDir - ray.direction).normalize();
+					Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f) * intensity;
+					Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine()) * intensity;
+					color += light->color * (diffuse + specular);
+				}
+			}
+		}
+		else {
 			lightPos = random_point_on_light(light);
 			float shadowDist = (lightPos - (hitPoint + n * EPSILON)).length();
 			shadowDir = (lightPos - (hitPoint + n * EPSILON));
@@ -613,7 +662,8 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 			if (shadowDir.normalize() * n <= 0) continue;
 
-			float intensity = calculate_intensity(light, hitPoint);
+			//float intensity = calculate_intensity(light, hitPoint);
+			//float intensity = calculate_intensity(light, hitPoint);
 
 			if (Accel_Struct == NONE) {
 				for (int i = 0; i < numObjs; i++) {
@@ -645,8 +695,8 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 			if (!inShadow) {
 				Vector h = (shadowDir - ray.direction).normalize();
-				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f) * intensity;
-				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine()) * intensity;
+				Color diffuse = m->GetDiffColor() * m->GetDiffuse() * max((n * shadowDir), 0.0f);
+				Color specular = m->GetSpecColor() * m->GetSpecular() * pow(max((h * n), 0.0f), m->GetShine());
 				color += light->color * (diffuse + specular);
 			}
 		}
