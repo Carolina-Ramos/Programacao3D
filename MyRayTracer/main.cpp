@@ -576,11 +576,11 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 	}
 	else if (Accel_Struct == BVH_ACC) {
 
-		/*if (!bvh_ptr->Traverse(ray, &hitObject, hitPoint)) {
+		if (!bvh_ptr->Traverse(ray, &hitObject, hitPoint)) {
 			if (skybox_flag) color = scene->GetSkyboxColor(ray);
 			else color = scene->GetBackgroundColor();
 			return color;
-		}*/
+		}
 	}
 
 	Vector n = hitObject->getNormal(hitPoint).normalize();
@@ -626,14 +626,14 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 						break;
 					}
 				}
-				else if (Accel_Struct == BVH_ACC) {
+				/*else if (Accel_Struct == BVH_ACC) {
 					Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
 
-					if (grid_ptr->Traverse(shadowRay)) {
+					if (bvh_ptr->Traverse(shadowRay)) {
 						inShadow = true;
 						break;
 					}
-				}
+				}*/
 
 				if (!inShadow) {
 					Vector h = (shadowDir - ray.direction).normalize();

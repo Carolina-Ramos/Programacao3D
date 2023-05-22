@@ -142,12 +142,86 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			float tmp;
 			float tmin = FLT_MAX;  //contains the closest primitive intersection
 			bool hit = false;
+			float t0, t1, t2;
 
 			BVHNode* currentNode = nodes[0];
 
 			//PUT YOUR CODE HERE
+			Ray localRay = ray;
+			int leftIndex, rightIndex;
+			AABB leftBox, rightBox;
 			
-			return(false);
+			if (!currentNode->getAABB().intercepts(localRay, t0))
+				return false;
+			while (true){
+				if (!currentNode->isLeaf()) {
+					leftIndex = currentNode->getIndex() * 2;
+					rightIndex = (currentNode->getIndex() * 2) + 1;
+					leftBox = nodes[leftIndex]->getAABB();
+					rightBox = nodes[rightIndex]->getAABB();
+
+					if (leftBox.intercepts(localRay, t1) && rightBox.intercepts(localRay, t2)) {
+						StackItem stackItem1(nodes[leftIndex], t1);
+						StackItem stackItem2(nodes[rightIndex], t2);
+						if (t1 > t2) {
+							hit_stack.push(stackItem1);
+							currentNode = nodes[rightIndex];
+						}
+						else {
+							hit_stack.push(stackItem2);
+							currentNode = nodes[leftIndex];
+						}
+						continue;
+					}
+					else if (leftBox.intercepts(localRay, t1)) {
+						currentNode = nodes[leftIndex];
+						continue;
+					}
+					else if (rightBox.intercepts(localRay, t2)) {
+						currentNode = nodes[rightIndex];
+						continue;
+					}
+				}
+				else { //Leaf
+					int numObjs = currentNode->getNObjs();
+					int obj1Index = currentNode->getIndex(); //objs vector
+					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
+						if (objects[i]->GetBoundingBox().intercepts(localRay, t1) && t1 < tmin) {
+							tmin = t1;
+							hit_obj = &objects[i];
+							//hit_point = ray.origin + ray.direction * tmin;
+						}
+					}
+				}
+
+				for (int i = 0; i < hit_stack.size(); i++) {
+					if (hit_stack.empty()) {
+						if (tmin != FLT_MAX) {
+							hit_point = ray.origin + ray.direction * tmin;
+							return true;
+						}
+						else
+							return false;
+					}
+					StackItem topNode = hit_stack.top();
+					if (topNode.t < tmin) {
+						currentNode = topNode.ptr;
+						tmin = topNode.t;
+					}
+					hit_stack.pop();
+				}
+
+				/*if (!hit_stack.empty()) {
+					StackItem topNode = hit_stack.top();
+					if (topNode.t < tmin) {
+						currentNode = topNode.ptr;
+						tmin = topNode.t;
+					}
+					hit_stack.pop();
+				}*/
+			}
+			
+			//return(false);
 	}
 
 bool BVH::Traverse(Ray& ray) {  //shadow ray with length
