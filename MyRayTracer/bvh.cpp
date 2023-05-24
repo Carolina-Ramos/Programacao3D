@@ -195,15 +195,6 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 				}
 
 				for (int i = 0; i < hit_stack.size(); i++) {
-					/*if (hit_stack.empty()) {
-						if (hit) {
-							hit_point = ray.origin + ray.direction * tmin;
-							return true;
-						}
-						else {
-							return false;
-						}
-					}*/
 					StackItem topNode = hit_stack.top();
 					if (topNode.t < tmin) {
 						currentNode = topNode.ptr;
@@ -211,6 +202,7 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					}
 					hit_stack.pop();
 				}
+
 				if (hit_stack.empty()) {
 					if (hit) {
 						hit_point = ray.origin + ray.direction * tmin;
@@ -224,12 +216,59 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 	}
 
 bool BVH::Traverse(Ray& ray) {  //shadow ray with length
-			float tmp;
+			float tmp, t1, t2;
 
 			double length = ray.direction.length(); //distance between light and intersection point
 			ray.direction.normalize();
 
-			//PUT YOUR CODE HERE
+			BVHNode* currentNode = nodes[0];
+			int leftIndex, rightIndex;
+			AABB leftBox, rightBox;
 
-			return(false);
+			if (!currentNode->getAABB().intercepts(ray, tmp))
+				return false;
+
+			while (true){
+				if (!currentNode->isLeaf()) {
+					leftIndex = currentNode->getIndex();
+					rightIndex = (currentNode->getIndex() + 1);
+					leftBox = nodes[leftIndex]->getAABB();
+					rightBox = nodes[rightIndex]->getAABB();
+
+					if (leftBox.intercepts(ray, t1) && rightBox.intercepts(ray, t2)) {
+						StackItem stackItem1(nodes[leftIndex], t1);
+						StackItem stackItem2(nodes[rightIndex], t2);
+						hit_stack.push(stackItem2);
+						currentNode = nodes[leftIndex];
+						continue;
+					}
+					else if (leftBox.intercepts(ray, t1)) {
+						currentNode = nodes[leftIndex];
+						continue;
+					}
+					else if (rightBox.intercepts(ray, t2)) {
+						currentNode = nodes[rightIndex];
+						continue;
+					}
+				}
+				else { //Leaf
+					int numObjs = currentNode->getNObjs();
+					int obj1Index = currentNode->getIndex(); //objs vector
+					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
+						if (objects[i]->GetBoundingBox().intercepts(ray, t1))
+							return true;
+					}
+				}
+
+				/*for (int i = 0; i < hit_stack.size(); i++) {
+					hit_stack.pop();
+				}*/
+
+				if (hit_stack.empty())
+					return false;
+
+				StackItem topNode = hit_stack.top();
+				currentNode = topNode.ptr;
+				hit_stack.pop();
+			}
 	}		
