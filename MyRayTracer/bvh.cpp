@@ -139,7 +139,6 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 }
 
 bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
-			float tmp;
 			float tmin = FLT_MAX;  //contains the closest primitive intersection
 			bool hit = false;
 			float t0, t1, t2;
@@ -147,20 +146,21 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			BVHNode* currentNode = nodes[0];
 
 			//PUT YOUR CODE HERE
-			Ray localRay = ray;
 			int leftIndex, rightIndex;
 			AABB leftBox, rightBox;
 			
-			if (!currentNode->getAABB().intercepts(localRay, t0))
+			if (!currentNode->getAABB().intercepts(ray, t0)) {
 				return false;
+			}
+
 			while (true){
 				if (!currentNode->isLeaf()) {
-					leftIndex = currentNode->getIndex() * 2;
-					rightIndex = (currentNode->getIndex() * 2) + 1;
+					leftIndex = currentNode->getIndex();
+					rightIndex = (currentNode->getIndex() + 1);
 					leftBox = nodes[leftIndex]->getAABB();
 					rightBox = nodes[rightIndex]->getAABB();
 
-					if (leftBox.intercepts(localRay, t1) && rightBox.intercepts(localRay, t2)) {
+					if (leftBox.intercepts(ray, t1) && rightBox.intercepts(ray, t2)) {
 						StackItem stackItem1(nodes[leftIndex], t1);
 						StackItem stackItem2(nodes[rightIndex], t2);
 						if (t1 > t2) {
@@ -173,11 +173,11 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 						}
 						continue;
 					}
-					else if (leftBox.intercepts(localRay, t1)) {
+					else if (leftBox.intercepts(ray, t1)) {
 						currentNode = nodes[leftIndex];
 						continue;
 					}
-					else if (rightBox.intercepts(localRay, t2)) {
+					else if (rightBox.intercepts(ray, t2)) {
 						currentNode = nodes[rightIndex];
 						continue;
 					}
@@ -186,23 +186,24 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					int numObjs = currentNode->getNObjs();
 					int obj1Index = currentNode->getIndex(); //objs vector
 					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
-						if (objects[i]->GetBoundingBox().intercepts(localRay, t1) && t1 < tmin) {
+						if (objects[i]->GetBoundingBox().intercepts(ray, t1) && t1 < tmin) {
 							tmin = t1;
-							hit_obj = &objects[i];
-							//hit_point = ray.origin + ray.direction * tmin;
+							*hit_obj = objects[i];
+							hit = true;
 						}
 					}
 				}
 
 				for (int i = 0; i < hit_stack.size(); i++) {
-					if (hit_stack.empty()) {
-						if (tmin != FLT_MAX) {
+					/*if (hit_stack.empty()) {
+						if (hit) {
 							hit_point = ray.origin + ray.direction * tmin;
 							return true;
 						}
-						else
+						else {
 							return false;
-					}
+						}
+					}*/
 					StackItem topNode = hit_stack.top();
 					if (topNode.t < tmin) {
 						currentNode = topNode.ptr;
@@ -210,18 +211,16 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					}
 					hit_stack.pop();
 				}
-
-				/*if (!hit_stack.empty()) {
-					StackItem topNode = hit_stack.top();
-					if (topNode.t < tmin) {
-						currentNode = topNode.ptr;
-						tmin = topNode.t;
+				if (hit_stack.empty()) {
+					if (hit) {
+						hit_point = ray.origin + ray.direction * tmin;
+						return true;
 					}
-					hit_stack.pop();
-				}*/
+					else {
+						return false;
+					}
+				}
 			}
-			
-			//return(false);
 	}
 
 bool BVH::Traverse(Ray& ray) {  //shadow ray with length

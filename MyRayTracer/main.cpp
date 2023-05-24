@@ -626,14 +626,14 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 						break;
 					}
 				}
-				/*else if (Accel_Struct == BVH_ACC) {
+				else if (Accel_Struct == BVH_ACC) {
 					Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
 
 					if (bvh_ptr->Traverse(shadowRay)) {
 						inShadow = true;
 						break;
 					}
-				}*/
+				}
 
 				if (!inShadow) {
 					Vector h = (shadowDir - ray.direction).normalize();
@@ -677,7 +677,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 			else if (Accel_Struct == BVH_ACC) {
 				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
 
-				if (grid_ptr->Traverse(shadowRay)) {
+				if (bvh_ptr->Traverse(shadowRay)) {
 					inShadow = true;
 					break;
 				}
