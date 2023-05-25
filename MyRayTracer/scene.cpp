@@ -21,15 +21,21 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	Min = Vector(+FLT_MAX, +FLT_MAX, +FLT_MAX);
 	Max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
+	Min.x = std::min(std::min(points[0].x, points[1].x), points[2].x);
+	Max.x = std::max(std::max(points[0].x, points[1].x), points[2].x);
+	Min.y = std::min(std::min(points[0].y, points[1].y), points[2].y);
+	Max.y = std::max(std::max(points[0].y, points[1].y), points[2].y);
+	Min.z = std::min(std::min(points[0].z, points[1].z), points[2].z);
+	Max.z = std::max(std::max(points[0].z, points[1].z), points[2].z);
 
-	for (int i = 0; i < 3; i++) {
+	/*for (int i = 0; i < 3; i++) {
 		if (points[i].x < Min.x) Min.x = points[i].x;
 		if (points[i].x > Max.x) Max.x = points[i].x;
 		if (points[i].y < Min.y) Min.y = points[i].y;
 		if (points[i].y > Max.y) Max.y = points[i].y;
 		if (points[i].z < Min.z) Min.z = points[i].z;
 		if (points[i].z > Max.z) Max.z = points[i].z;
-	}
+	}*/
 
 
 	// enlarge the bounding box a bit just in case...
@@ -178,6 +184,7 @@ AABB aaBox::GetBoundingBox() {
 
 bool aaBox::intercepts(Ray& ray, float& t)
 {
+	printf("AQUI?");
 	double tx_min, ty_min, tz_min, tx_max, ty_max, tz_max;
 
 	double a = 1 / ray.direction.x;

@@ -591,12 +591,12 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 	int numLights = scene->getNumLights();
 	int numSamples = 2;
 
+	if (spp != 0)
+		numSamples = 1;
+
 	for (int l = 0; l < numLights; l++) {
 		bool inShadow = false;
 		light = scene->getLight(l);
-
-		if (spp != 0)
-			numSamples = 1;
 
 		for (int p = 0; p < numSamples; p++) {
 			lightPos = random_point_on_light(light);
