@@ -96,17 +96,23 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		cmp.dimension = getLongestAxis(node, midPoint);
 		std::sort(objects.begin() + left_index, objects.begin() + right_index, cmp);
 
-		for (int i = left_index; i < right_index; i++) {
-			if (objects[i]->GetBoundingBox().centroid().getAxisValue(cmp.dimension) > midPoint) {
-				split_index = i;
-				initialized = true;
-				break;
+		if (objects[0]->GetBoundingBox().centroid().getAxisValue(cmp.dimension) > midPoint) { //check if left Node is empty
+			split_index = medianSplit(left_index, right_index, cmp.dimension);
+			initialized = true;
+		}
+		else {
+			for (int i = left_index; i < right_index; i++) {
+				if (objects[i]->GetBoundingBox().centroid().getAxisValue(cmp.dimension) > midPoint) {
+					split_index = i;
+					initialized = true;
+					break;
+				}
+				else
+					continue;
 			}
-			else
-				continue;
 		}
 
-		if (!initialized)
+		if (!initialized) //check if right Node is empty
 			split_index = medianSplit(left_index, right_index, cmp.dimension);
 
 		node->makeNode(nodes.size());
@@ -150,9 +156,8 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			int leftIndex, rightIndex;
 			AABB leftBox, rightBox;
 			
-			if (!currentNode->getAABB().intercepts(ray, t0)) {
+			if (!currentNode->getAABB().intercepts(ray, t0))
 				return false;
-			}
 
 			while (true){
 				if (!currentNode->isLeaf()) {
@@ -161,12 +166,19 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					leftBox = nodes[leftIndex]->getAABB();
 					rightBox = nodes[rightIndex]->getAABB();
 
-					if (leftBox.intercepts(ray, t1) && rightBox.intercepts(ray, t2)) {
+					bool leftIntercepts = leftBox.intercepts(ray, t1);
+					bool rightIntercepts = rightBox.intercepts(ray, t2);
+
+					if (leftBox.isInside(ray.origin)) t1 = 0;
+					if (rightBox.isInside(ray.origin)) t2 = 0;
+
+					if (leftIntercepts && rightIntercepts) {
 						//check if r.origin is inside AABB
 
 						StackItem stackItem1(nodes[leftIndex], t1);
 						StackItem stackItem2(nodes[rightIndex], t2);
-						if (t1 > t2) {
+
+						if (t2 <= t1) {
 							hit_stack.push(stackItem1);
 							currentNode = nodes[rightIndex];
 						}
@@ -176,11 +188,11 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 						}
 						continue;
 					}
-					else if (leftBox.intercepts(ray, t1)) {
+					else if (leftIntercepts) {
 						currentNode = nodes[leftIndex];
 						continue;
 					}
-					else if (rightBox.intercepts(ray, t2)) {
+					else if (rightIntercepts) {
 						currentNode = nodes[rightIndex];
 						continue;
 					}
@@ -189,31 +201,35 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					int numObjs = currentNode->getNObjs();
 					int obj1Index = currentNode->getIndex(); //objs vector
 					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
-						if (objects[i]->GetBoundingBox().intercepts(ray, t1) && t1 < tmin && !objects[i]->GetBoundingBox().isInside(ray.origin)) {
+						if (objects[i]->intercepts(ray, t1) && t1 < tmin) {
 							tmin = t1;
 							*hit_obj = objects[i];
 							hit = true;
 						}
 					}
 				}
+				bool stackChange = false;
 
-				for (int i = 0; i < hit_stack.size(); i++) {
+				while (!hit_stack.empty()) {
 					StackItem topNode = hit_stack.top();
+					hit_stack.pop();
 					if (topNode.t < tmin) {
 						currentNode = topNode.ptr;
-						tmin = topNode.t;
+						//tmin = topNode.t;
+						stackChange = true;
+						break;
 					}
-					hit_stack.pop();
 				}
 
 				if (hit_stack.empty()) {
-					if (hit) {
+					if (hit && !stackChange) {
 						hit_point = ray.origin + ray.direction * tmin;
 						return true;
 					}
-					else {
+					else if (stackChange) 
+						continue;
+					else
 						return false;
-					}
 				}
 			}
 	}
@@ -258,14 +274,10 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 					int numObjs = currentNode->getNObjs();
 					int obj1Index = currentNode->getIndex(); //objs vector
 					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
-						if (objects[i]->GetBoundingBox().intercepts(ray, t1))
+						if (objects[i]->intercepts(ray, t1))
 							return true;
 					}
 				}
-
-				/*for (int i = 0; i < hit_stack.size(); i++) {
-					hit_stack.pop();
-				}*/
 
 				if (hit_stack.empty())
 					return false;
