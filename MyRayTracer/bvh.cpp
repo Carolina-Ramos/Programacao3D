@@ -105,6 +105,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 			else
 				continue;
 		}
+
 		if (!initialized)
 			split_index = medianSplit(left_index, right_index, cmp.dimension);
 
@@ -161,6 +162,8 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					rightBox = nodes[rightIndex]->getAABB();
 
 					if (leftBox.intercepts(ray, t1) && rightBox.intercepts(ray, t2)) {
+						//check if r.origin is inside AABB
+
 						StackItem stackItem1(nodes[leftIndex], t1);
 						StackItem stackItem2(nodes[rightIndex], t2);
 						if (t1 > t2) {
@@ -186,7 +189,7 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 					int numObjs = currentNode->getNObjs();
 					int obj1Index = currentNode->getIndex(); //objs vector
 					for (int i = obj1Index; i < obj1Index + numObjs; i++) {
-						if (objects[i]->GetBoundingBox().intercepts(ray, t1) && t1 < tmin) {
+						if (objects[i]->GetBoundingBox().intercepts(ray, t1) && t1 < tmin && !objects[i]->GetBoundingBox().isInside(ray.origin)) {
 							tmin = t1;
 							*hit_obj = objects[i];
 							hit = true;
