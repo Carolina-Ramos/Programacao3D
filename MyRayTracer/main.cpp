@@ -496,40 +496,6 @@ float calculateSchlickApproximation(Vector I, Vector N, float ior1, float ior2)
 	return r0 + (1 - r0) * pow(1 - cosOi, 5);
 }
 
-bool is_shadowed(Vector lightPos, Vector point) {
-	Vector shadowDir = (lightPos - point).normalize();
-	Ray shadowRay(point + shadowDir * EPSILON, shadowDir);
-	int numObjs = scene->getNumObjects();
-	Object* obj;
-
-	for (int i = 0; i < numObjs; i++) {
-		obj = scene->getObject(i);
-		float dist;
-		if (obj->intercepts(shadowRay, dist)) {
-			return true; // point is in shadow
-		}
-	}
-
-	return false; // point is not in shadow
-}
-
-float calculate_intensity(Light* light, Vector hitPoint) {
-	float total = 0.0f;
-	int numSamples = 4;
-
-	for (int v = 0; v < 2; v++) {
-		for (int u = 0; u < 2; u++) {
-			Vector lightPosition = random_point_on_light(light);
-			if (!is_shadowed(lightPosition, hitPoint)) {
-				total += 1.0f;
-			}
-		}
-	}
-
-	return total / (numSamples * numSamples);
-}
-
-
 Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of medium 1 where the ray is travelling
 
 	int numObjs = scene->getNumObjects();
@@ -609,7 +575,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 			if (shadowDir.normalize() * n <= 0) continue;
 
-			float intensity = 0.5f;
+			float intensity = 1.0f / numSamples;
 
 			if (Accel_Struct == NONE) {
 				for (int i = 0; i < numObjs; i++) {
