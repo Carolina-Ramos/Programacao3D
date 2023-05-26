@@ -588,6 +588,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 	Light* light;
 	Vector lightPos;
 	Vector shadowDir;
+	Vector shadowDirNotNormalized;
 	int numLights = scene->getNumLights();
 	int numSamples = 2;
 
@@ -602,6 +603,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 			lightPos = random_point_on_light(light);
 			float shadowDist = (lightPos - (hitPoint + n * EPSILON)).length();
 			shadowDir = (lightPos - (hitPoint + n * EPSILON));
+			shadowDirNotNormalized = shadowDir;
 
 			if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
 
@@ -621,7 +623,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 				}
 			}
 			else if (Accel_Struct == GRID_ACC) {
-				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDirNotNormalized);
 
 				if (grid_ptr->Traverse(shadowRay)) {
 					inShadow = true;
@@ -629,7 +631,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 				}
 			}
 			else if (Accel_Struct == BVH_ACC) {
-				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDir);
+				Ray shadowRay = Ray(hitPoint + n * EPSILON, shadowDirNotNormalized);
 
 				if (bvh_ptr->Traverse(shadowRay)) {
 					inShadow = true;
@@ -716,8 +718,6 @@ void renderScene()
 						Vector pixel;  //viewport coordinates
 						pixel.x = x + (p + rand_float()) / n;
 						pixel.y = y + (q + rand_float()) / n;
-
-						//Ray ray = scene->GetCamera()->PrimaryRay(pixel);
 
 						Vector lensSample = rnd_unit_disk() * aperture;
 						Ray ray = scene->GetCamera()->PrimaryRay(lensSample / 2, pixel); // divide by 2 because aperture is diameter, not ray

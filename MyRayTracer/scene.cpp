@@ -184,7 +184,6 @@ AABB aaBox::GetBoundingBox() {
 
 bool aaBox::intercepts(Ray& ray, float& t)
 {
-	printf("AQUI?");
 	double tx_min, ty_min, tz_min, tx_max, ty_max, tz_max;
 
 	double a = 1 / ray.direction.x;
