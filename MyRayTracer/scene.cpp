@@ -129,12 +129,12 @@ bool Sphere::intercepts(Ray& r, float& t )
 	float b = r.direction * oc;
 	float c = (oc * oc) - pow(this->radius, 2);
 
-	if (c < 0) {
+	if (c < 0) { //ray.origin inside the sphere
 		t = b + sqrt(pow(b, 2) - c);
 		return true;
 	}
 	else {
-		if (b <= 0) return false;
+		if (b <= 0) return false; //sphere behinf the ray
 		else {
 			if ((pow(b, 2) - c) <= 0) return false;
 			else {
