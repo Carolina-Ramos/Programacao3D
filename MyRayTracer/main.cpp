@@ -462,9 +462,10 @@ Vector random_point_on_light(Light* light) {
 	return position;
 }
 
-Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection) {
+Vector reflect(Vector& I, Vector& N, Vector& hitpoint, bool& hasReflection, float roughness) {
+
 	Vector R = N * ((I * -1) * N) * 2 + I;
-	Vector S = hitpoint + R + rnd_unit_sphere( )* 0.3f;
+	Vector S = hitpoint + R + rnd_unit_sphere( )* roughness;
 	Vector reflect = (S - hitpoint).normalize();
 	if (reflect * N > 0) {
 		hasReflection = true;
@@ -634,9 +635,10 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 		kr = m->GetReflection();
 	}
 
+	float roughness = m->GetDiffuse();
 	if (m->GetReflection() > 0) {
 		bool hasReflection = false;
-		Vector rDir = reflect(ray.direction, n, hitPoint, hasReflection).normalize();
+		Vector rDir = reflect(ray.direction, n, hitPoint, hasReflection, roughness).normalize();
 		if (hasReflection) {
 			Ray rRay = Ray(hitPoint + n * EPSILON, rDir);
 			color += rayTracing(rRay, depth + 1, ior_1) * kr * m->GetSpecColor();
