@@ -21,21 +21,14 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	Min = Vector(+FLT_MAX, +FLT_MAX, +FLT_MAX);
 	Max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-	Min.x = std::min(std::min(points[0].x, points[1].x), points[2].x);
-	Max.x = std::max(std::max(points[0].x, points[1].x), points[2].x);
-	Min.y = std::min(std::min(points[0].y, points[1].y), points[2].y);
-	Max.y = std::max(std::max(points[0].y, points[1].y), points[2].y);
-	Min.z = std::min(std::min(points[0].z, points[1].z), points[2].z);
-	Max.z = std::max(std::max(points[0].z, points[1].z), points[2].z);
-
-	/*for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		if (points[i].x < Min.x) Min.x = points[i].x;
 		if (points[i].x > Max.x) Max.x = points[i].x;
 		if (points[i].y < Min.y) Min.y = points[i].y;
 		if (points[i].y > Max.y) Max.y = points[i].y;
 		if (points[i].z < Min.z) Min.z = points[i].z;
 		if (points[i].z > Max.z) Max.z = points[i].z;
-	}*/
+	}
 
 
 	// enlarge the bounding box a bit just in case...
@@ -49,7 +42,7 @@ AABB Triangle::GetBoundingBox() {
 
 Vector Triangle::getNormal(Vector point)
 {
-	return normal;
+	return normal.normalize();
 }
 
 //
@@ -139,6 +132,7 @@ bool Sphere::intercepts(Ray& r, float& t )
 
 	if (c < 0) {
 		t = b + sqrt(pow(b, 2) - c);
+		return true;
 	}
 	else {
 		if (b <= 0) return false;
@@ -146,6 +140,7 @@ bool Sphere::intercepts(Ray& r, float& t )
 			if ((pow(b, 2) - c) <= 0) return false;
 			else {
 				t = b - sqrt(pow(b, 2) - c);
+				return true;
 			}
 		}
 	}
@@ -252,11 +247,11 @@ bool aaBox::intercepts(Ray& ray, float& t)
 	if (tE < tL && tL > 0) { 
 		if (tE > 0) {		//ray hits outside the surface
 			t = tE;
-			Normal = face_in;
+			this->Normal = face_in;
 		}
 		else {		//ray hits inside the surface
 			t = tL;
-			Normal = face_out;
+			this->Normal = face_out;
 		}
 		return true;
 	}
@@ -267,7 +262,7 @@ bool aaBox::intercepts(Ray& ray, float& t)
 
 Vector aaBox::getNormal(Vector point)
 {
-	return Normal;
+	return this->Normal.normalize();
 }
 
 Scene::Scene()

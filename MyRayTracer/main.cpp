@@ -453,10 +453,11 @@ void setupGLUT(int argc, char* argv[])
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 Vector random_point_on_light(Light* light) {
 	// Generate a random point on the surface of the area light
+	int lightSize = 2;
 	float u = rand_float();
 	float v = rand_float();
 
-	Vector position = light->position + 0.5f * (u + 0.5f) + 0.5f * (v + 0.5f);
+	Vector position = light->position + lightSize * 0.5f * (u + 0.5f) + lightSize * 0.5f * (v + 0.5f);
 
 	return position;
 }
@@ -567,8 +568,8 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 		for (int p = 0; p < numSamples; p++) {
 			lightPos = random_point_on_light(light);
-			float shadowDist = (lightPos - (hitPoint + n * EPSILON)).length();
-			shadowDir = (lightPos - (hitPoint + n * EPSILON));
+			float shadowDist = (lightPos - hitPoint).length();
+			shadowDir = (lightPos - hitPoint);
 			shadowDirNotNormalized = shadowDir;
 
 			if (Accel_Struct == NONE) shadowDir = shadowDir.normalize();
@@ -582,7 +583,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 					if (i == minIndex) continue; // Skip object we are checking intersection against
 
 					obj = scene->getObject(i);
-					if (obj->intercepts(Ray(hitPoint, shadowDir), shadowDist)) {
+					if (obj->intercepts(Ray(hitPoint + n * EPSILON, shadowDir), shadowDist)) {
 						inShadow = true;
 						break;
 					}
@@ -635,7 +636,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 	if (m->GetReflection() > 0) {
 		bool hasReflection = false;
-		Vector rDir = reflect(ray.direction, n, hitPoint, hasReflection);
+		Vector rDir = reflect(ray.direction, n, hitPoint, hasReflection).normalize();
 		if (hasReflection) {
 			Ray rRay = Ray(hitPoint + n * EPSILON, rDir);
 			color += rayTracing(rRay, depth + 1, ior_1) * kr * m->GetSpecColor();
@@ -644,7 +645,7 @@ Color rayTracing(Ray ray, int depth, float ior_1) {  //index of refraction of me
 
 	if (m->GetTransmittance() > 0) {
 		float snellLaw = !inside ? ior_1 / m->GetRefrIndex() : ior_1;
-		Vector tDir = refract(ray.direction, n, snellLaw);
+		Vector tDir = refract(ray.direction, n, snellLaw).normalize();
 		Ray tRay = Ray(hitPoint + tDir * EPSILON, tDir);
 		color += rayTracing(tRay, depth + 1, newIoR) * (1 - kr);
 	}
