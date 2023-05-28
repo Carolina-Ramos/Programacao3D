@@ -51,7 +51,7 @@ Vector Triangle::getNormal(Vector point)
 
 bool Triangle::intercepts(Ray& r, float& t ) {
 
-	Vector edge1, edge2, edge3, tvec, pvec, qvec;
+	Vector edge1, edge2, tvec, pvec, qvec;
 	float det, inv_det;
 
 	edge1 = points[1] - points[0];
@@ -61,7 +61,7 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 
 	det = edge1 * pvec;
 
-	if (det < EPSILON) return false;
+	if (det < 0.000001) return false;
 
 	tvec = r.origin - points[0];
 
@@ -74,10 +74,9 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 	if (v < 0 || u + v > det) return false;
 
 	t = edge2 * qvec;
+
 	inv_det = 1.f / det;
 	t *= inv_det;
-	u *= inv_det;
-	v *= inv_det;
 
 	return true;
 }
